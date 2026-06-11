@@ -52,7 +52,6 @@ CREATE TABLE Paciente (
     Nombre VARCHAR(50) NOT NULL,
     Apellido1 VARCHAR(50) NOT NULL,
     Apellido2 VARCHAR(50) NOT NULL,
-    Edad INT NOT NULL,
     FechaNacimiento DATE NOT NULL,
     PaisResidencia VARCHAR(50) NOT NULL,
     PesoInicial DECIMAL(5,2) NOT NULL,
