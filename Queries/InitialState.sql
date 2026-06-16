@@ -21,13 +21,13 @@
 --('1-1234-5678', 'Mariela', 'Alvarado Rojas', 'NUT-2026-09', 34, '1992-04-12', 62.50, 22.30, 'Cartago Centro, 300m Este de las Ruinas', NULL, '4000123456789010', 'Mensual', 'malvarado@nutricion.cr', 'AQAAAAEAACcQAAAAEGxndXRpZXJyZXpQYXNzMTIzIQ==');
 
 -- 4. INSERTAR UN PACIENTE DE PRUEBA
-INSERT INTO Paciente (Email, Nombre, Apellido1, Apellido2, FechaNacimiento, PaisResidencia, PesoInicial, PesoActual, ConsumoMaxCalorias, PasswordEncriptado)
-VALUES 
-('joel@gmail.com', 'Joel', 'Barboza', 'Picado', '2004-02-04', 'Costa Rica', 57.00, 61.40, 2000, 'joel1234');
+--INSERT INTO Paciente (Email, Nombre, Apellido1, Apellido2, FechaNacimiento, PaisResidencia, PesoInicial, PesoActual, ConsumoMaxCalorias, PasswordEncriptado)
+--VALUES 
+--('joel@gmail.com', 'Joel', 'Barboza', 'Picado', '2004-02-04', 'Costa Rica', 57.00, 61.40, 2000, 'joel1234');
 
-INSERT INTO Paciente (Email, Nombre, Apellido1, Apellido2, FechaNacimiento, PaisResidencia, PesoInicial, PesoActual, ConsumoMaxCalorias, PasswordEncriptado)
-VALUES 
-('pedro@gmail.com', 'Pedro', 'Perico', 'Perico', '2001-02-04', 'Costa Rica', 570.00, 0.40, 2, 'pericoelguapo1234');
+--INSERT INTO Paciente (Email, Nombre, Apellido1, Apellido2, FechaNacimiento, PaisResidencia, PesoInicial, PesoActual, ConsumoMaxCalorias, PasswordEncriptado)
+--VALUES 
+--('pedro@gmail.com', 'Pedro', 'Perico', 'Perico', '2001-02-04', 'Costa Rica', 570.00, 0.40, 2, 'pericoelguapo1234');
 
 
 

@@ -15,7 +15,7 @@
 --DROP TABLE IF EXISTS Producto;
 --DROP TABLE IF EXISTS RegistroMedidas;
 DROP TABLE IF EXISTS Paciente;
---DROP TABLE IF EXISTS Nutricionista;
+DROP TABLE IF EXISTS Nutricionista;
 --DROP TABLE IF EXISTS Administrador;
 GO
 
@@ -29,23 +29,25 @@ GO
 --    PRIMARY KEY (Email)
 --);
 
---CREATE TABLE Nutricionista (
---    Cedula VARCHAR(20) NOT NULL,
---    Nombre VARCHAR(50) NOT NULL,
---    Apellidos VARCHAR(100) NOT NULL,
---    CodigoNutricionista VARCHAR(20) NOT NULL,
---    Edad INT NOT NULL,
---    FechaNacimiento DATE NOT NULL,
---    PesoDecimal DECIMAL(5,2) NOT NULL,
---    IMC DECIMAL(4,2) NOT NULL,
---    Direccion VARCHAR(255) NOT NULL,
---    Foto VARCHAR(MAX) NULL,
---    NumeroTarjeta VARCHAR(20) NOT NULL,
---    TipoCobro VARCHAR(15) NOT NULL,
---    Email VARCHAR(150) NOT NULL,
---    PasswordEncriptado VARCHAR(255) NOT NULL,
---    PRIMARY KEY (Cedula)
---);
+--select * from Nutricionista;
+
+CREATE TABLE Nutricionista (
+    CodigoNutricionista VARCHAR(20) NOT NULL,
+    Cedula VARCHAR(20) NOT NULL,
+    Nombre VARCHAR(50) NOT NULL,
+    Apellido1 VARCHAR(50) NOT NULL,
+    Apellido2 VARCHAR(50),
+    FechaNacimiento DATE NOT NULL,
+    Peso DECIMAL(5,2) NOT NULL,
+    IMC DECIMAL(4,2) NOT NULL,
+    Direccion VARCHAR(255) NOT NULL,
+    Foto VARCHAR(MAX) NULL,
+    NumeroTarjeta VARCHAR(20) NOT NULL,
+    TipoCobro VARCHAR(15) NOT NULL,
+    Email VARCHAR(150) NOT NULL,
+    PasswordEncriptado VARCHAR(255) NOT NULL,
+    PRIMARY KEY (CodigoNutricionista)
+);
 
 CREATE TABLE Paciente (
     Email VARCHAR(150) NOT NULL,

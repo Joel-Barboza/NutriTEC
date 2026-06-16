@@ -1,0 +1,9 @@
+# Excluir secretos de Azure y Web Deploy
+**/Properties/PublishProfiles/
+**/Properties/serviceDependencies/
+**/*.pubxml
+**/*.pubxml.user
+**/*.secret.json
+
+# Excluir configuraciones locales con contraseñas
+**/appsettings.json

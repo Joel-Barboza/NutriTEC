@@ -1,0 +1,31 @@
+<div class="dashboard-container">
+  <nav class="sidebar">
+    <div class="sidebar-brand">
+      <img src="assets/logo.png" alt="Logo NutriTEC" class="logo" />
+      <span class="brand-name">NutriTEC</span>
+    </div>
+
+    <div class="user-info" *ngIf="currentUser">
+      <div class="user-avatar">{{ currentUser.nombre.charAt(0) }}{{ currentUser.apellido1.charAt(0) }}</div>
+      <div class="user-details">
+        <span class="user-name">{{ currentUser.nombre }} {{ currentUser.apellido1 }}</span>
+        <span class="user-email">{{ currentUser.email }}</span>
+      </div>
+    </div>
+
+    <ul class="nav-menu">
+      <li *ngFor="let item of menu" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
+        <a [routerLink]="['/dashboard', item.valor]">{{ item.nombre }}</a>
+      </li>
+    </ul>
+
+    <button class="btn-logout" (click)="cerrarSesion()">Cerrar Sesion</button>
+  </nav>
+
+  <main class="main-content">
+    <div class="content-header">
+      <h1>{{ seccionActual }}</h1>
+    </div>
+    <router-outlet />
+  </main>
+</div>
