@@ -1,0 +1,59 @@
+<div class="reservas-page">
+  <div class="reserva-top">
+    <h1>{{ title() }}</h1>
+    <button class="btn-recargar" (click)="cargarRetroalimentaciones()">🔄 Recargar</button>
+  </div>
+
+  <div class="estado-inicial" *ngIf="cargando()">
+    <p class="texto-cargando">Conectando con Azure y MongoDB... Por favor espere.</p>
+  </div>
+
+  <div class="toolbar" *ngIf="errorMsg()">
+    <p class="msg-error">⚠️ {{ errorMsg() }}</p>
+  </div>
+
+  <div class="estado-inicial" *ngIf="!cargando() && hilos().length === 0 && !errorMsg()">
+    <p>No se encontraron hilos de retroalimentación en la base de datos.</p>
+  </div>
+
+  <div class="reservas-list" *ngIf="!cargando() && hilos().length > 0">
+    <div class="reserva-card" *ngFor="let hilo of hilos()">
+      
+      <div class="reserva-top">
+        <div class="reserva-ruta">📌 {{ hilo.tituloHilo }}</div>
+        <span class="estado-badge">ID: {{ hilo.pacienteId }}</span>
+      </div>
+
+      <div class="reserva-details">
+        <div class="detail-item">
+          <span class="detail-label">Nutricionista</span>
+          <span class="detail-value">{{ hilo.nutricionistaId }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Fecha Apertura</span>
+          <span class="detail-value">{{ hilo.fechaCreacion | date:'dd/MM/yyyy HH:mm:ss' }}</span>
+        </div>
+      </div>
+
+      <div class="reserva-actions" style="background-color: #f9fafb; padding: 15px; border-radius: 8px; margin-top: 10px;">
+        <span class="detail-label" style="margin-bottom: 8px; display: block;">Historial de Mensajes</span>
+        
+        <div class="conversacion-container" style="display: flex; flex-direction: column; gap: 10px;">
+          <div *ngFor="let mensaje of hilo.conversacion" 
+               [style.align-self]="mensaje.autor === 'Nutricionista' ? 'flex-start' : 'flex-end'"
+               [style.background-color]="mensaje.autor === 'Nutricionista' ? '#eff6ff' : '#f0fdf4'"
+               [style.border-color]="mensaje.autor === 'Nutricionista' ? '#bfdbfe' : '#bbf7d0'"
+               style="max-width: 85%; padding: 10px 14px; border: 1px solid; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+            
+            <div style="display: flex; justify-content: space-between; gap: 20px; margin-bottom: 4px;">
+              <strong style="font-size: 0.8rem; color: #374151;">💬 {{ mensaje.autor }}</strong>
+              <small style="font-size: 0.7rem; color: #9ca3af;">{{ mensaje.fecha | date:'shortTime' }}</small>
+            </div>
+            <p style="margin: 0; font-size: 0.9rem; color: #1f2937;">{{ mensaje.mensaje }}</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

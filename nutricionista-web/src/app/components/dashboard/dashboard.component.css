@@ -1,0 +1,181 @@
+.dashboard-container {
+  display: flex;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+  background-color: #f7fcf8;
+}
+
+/* =========================
+   Sidebar
+========================= */
+.sidebar {
+  width: 220px;
+  background-color: #2f6f57;
+  color: #ffffff;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex-shrink: 0;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 20px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #5b8f7a;
+}
+
+.logo {
+  width: 40px;
+  height: auto;
+}
+
+.brand-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+/* =========================
+   Usuario
+========================= */
+.user-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background-color: #3d7f65;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #6bbf8b;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.user-name {
+  font-weight: bold;
+  font-size: 0.875rem;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-email {
+  font-size: 0.73rem;
+  color: #d7efe0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-badge {
+  font-size: 0.7rem;
+  color: #b8f2cf;
+  margin-top: 2px;
+}
+
+/* =========================
+   Navegación
+========================= */
+.nav-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex: 1;
+}
+
+.nav-menu li {
+  border-radius: 8px;
+  margin-bottom: 6px;
+}
+
+.nav-menu li a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  color: #eefaf2;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+}
+
+.nav-menu li.active a,
+.nav-menu li:hover a {
+  background-color: #6bbf8b;
+  color: #ffffff;
+}
+
+.nav-icon {
+  font-size: 1rem;
+  width: 18px;
+  text-align: center;
+}
+
+/* =========================
+   Botón cerrar sesión
+========================= */
+.btn-logout {
+  margin-top: 12px;
+  padding: 10px;
+  background-color: transparent;
+  color: #d7efe0;
+  border: 1px solid #5b8f7a;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.btn-logout:hover {
+  background-color: #3d7f65;
+  color: #ffffff;
+}
+
+/* =========================
+   Contenido principal
+========================= */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #f7fcf8;
+  overflow-y: auto;
+}
+
+/* Header */
+.content-header {
+  background-color: #ffffff;
+  border-bottom: 1px solid #d8ece0;
+  padding: 20px 30px;
+}
+
+.content-header h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #2f6f57;
+}

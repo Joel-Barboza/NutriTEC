@@ -1,0 +1,266 @@
+/* Page layout */
+.login-page {
+  min-height: 100vh;
+  background: #f3faf5;
+  display: flex;
+  flex-direction: column;
+  font-family: Arial, sans-serif;
+}
+
+/* Header */
+.login-header {
+  background-color: #2e7d32;
+  color: #ffffff;
+  padding: 20px 40px;
+  flex-shrink: 0;
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.login-logo {
+  width: 50px;
+  height: auto;
+}
+
+.login-header h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: bold;
+}
+
+.login-header p {
+  margin: 4px 0 0;
+  color: #d7f5dd;
+  font-size: 0.85rem;
+}
+
+/* Main Layout */
+.login-main {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 30px 40px;
+  box-sizing: border-box;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+/* Card */
+.auth-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(46, 125, 50, 0.08);
+  width: 420px;
+  transition: width 0.3s ease;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 1px solid #dcefe0;
+}
+
+.auth-card.wide-card {
+  width: 750px;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  border-bottom: 2px solid #dcefe0;
+}
+
+.tabs button {
+  flex: 1;
+  padding: 13px;
+  border: none;
+  background: #edf7ef;
+  color: #4b6351;
+  font-size: 0.875rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.tabs button.active {
+  background: #ffffff;
+  color: #2e7d32;
+  border-bottom: 3px solid #43a047;
+  margin-bottom: -2px;
+}
+
+.tabs button:hover:not(.active) {
+  background: #e2f2e5;
+}
+
+/* Formulario */
+.auth-form {
+  padding: 22px 24px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 20px;
+}
+
+.grid-section-title {
+  grid-column: span 2;
+  font-size: 0.95rem;
+  font-weight: bold;
+  color: #2e7d32;
+  border-bottom: 2px solid #c8e6c9;
+  padding-bottom: 5px;
+  margin-top: 10px;
+}
+
+.full-width {
+  grid-column: span 2;
+}
+
+.form-subtitle {
+  color: #5f6f63;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.field label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #254029;
+}
+
+.field input,
+.field select {
+  padding: 9px 10px;
+  border: 1px solid #c8ddcc;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  width: 100%;
+  background: #ffffff;
+  transition: 0.2s;
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: #43a047;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(67, 160, 71, 0.15);
+}
+
+.empty-spacer {
+  display: block;
+}
+
+/* Botones */
+.btn-primary {
+  padding: 11px 15px;
+  background-color: #43a047;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.92rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-primary:hover:not([disabled]) {
+  background-color: #2e7d32;
+}
+
+.btn-primary:disabled {
+  background-color: #a5d6a7;
+  cursor: not-allowed;
+}
+
+.btn-submit-reg {
+  margin-top: 15px;
+  padding: 12px;
+}
+
+/* Texto inferior */
+.toggle-hint {
+  text-align: center;
+  font-size: 0.825rem;
+  color: #617565;
+  margin: 0;
+}
+
+.toggle-hint a {
+  color: #2e7d32;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.toggle-hint a:hover {
+  text-decoration: underline;
+}
+
+/* Mensajes */
+.msg-error {
+  background: #ffebee;
+  border: 1px solid #ef9a9a;
+  color: #c62828;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.825rem;
+  margin-bottom: 10px;
+}
+
+.msg-success {
+  background: #e8f5e9;
+  border: 1px solid #a5d6a7;
+  color: #2e7d32;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.825rem;
+  margin-bottom: 10px;
+}
+
+/* Footer */
+.login-footer {
+  background-color: #1b5e20;
+  color: #d7f5dd;
+  text-align: center;
+  padding: 14px;
+  font-size: 0.78rem;
+  flex-shrink: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .auth-card.wide-card {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .grid-section-title,
+  .full-width {
+    grid-column: span 1;
+  }
+
+  .empty-spacer {
+    display: none;
+  }
+}
