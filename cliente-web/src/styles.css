@@ -1,4 +1,129 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --nt-green: #2e7d32;
+  --nt-green-light: #4caf50;
+  --nt-green-dark: #1b5e20;
+  --nt-accent: #81c784;
+}
+
 body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f4f6f4;
   margin: 0;
+}
+
+.sidebar {
+  min-height: 100vh;
+  background: var(--nt-green-dark);
+  color: #fff;
+}
+
+.sidebar .nav-link {
+  color: rgba(255, 255, 255, 0.8);
+  border-radius: 6px;
+  padding: 0.6rem 1rem;
+  margin-bottom: 4px;
+  transition: background 0.2s;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.sidebar .nav-link i {
+  width: 20px;
+  display: inline-block;
+}
+
+.page-content {
+  padding: 2rem;
+}
+
+.card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.btn-primary {
+  background-color: var(--nt-green);
+  border-color: var(--nt-green);
+}
+
+.btn-primary:hover {
+  background-color: var(--nt-green-dark);
+  border-color: var(--nt-green-dark);
+}
+
+.btn-outline-primary {
+  color: var(--nt-green);
+  border-color: var(--nt-green);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--nt-green);
+  border-color: var(--nt-green);
+  color: #fff;
+}
+
+.step-indicator {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.step-indicator .step {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  background: #e0e0e0;
+  color: #666;
+}
+
+.step-indicator .step.active {
+  background: var(--nt-green);
+  color: #fff;
+}
+
+.step-indicator .step.done {
+  background: var(--nt-accent);
+  color: #fff;
+}
+
+.login-wrapper {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--nt-green-dark) 0%, var(--nt-green-light) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+}
+
+.table-reporte th {
+  background: var(--nt-green);
+  color: #fff;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+  }
 }

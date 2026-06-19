@@ -1,0 +1,161 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="fw-bold mb-0"><i class="bi bi-book me-2 text-success"></i>Mis Recetas</h4>
+  <button *ngIf="!mostrarFormulario" class="btn btn-primary btn-sm" (click)="abrirFormulario()">
+    <i class="bi bi-plus-lg me-1"></i>Nueva Receta
+  </button>
+</div>
+
+<!-- Mensajes -->
+<div *ngIf="mensajeExito" class="alert alert-success alert-dismissible py-2">
+  {{ mensajeExito }}
+  <button type="button" class="btn-close" (click)="mensajeExito=''"></button>
+</div>
+<div *ngIf="mensajeError" class="alert alert-danger alert-dismissible py-2">
+  {{ mensajeError }}
+  <button type="button" class="btn-close" (click)="mensajeError=''"></button>
+</div>
+
+<!-- =================== FORMULARIO =================== -->
+<div *ngIf="mostrarFormulario" class="card p-4 mb-4">
+  <h6 class="fw-semibold mb-3">{{ editandoId ? 'Editar' : 'Nueva' }} Receta</h6>
+
+  <div class="mb-3">
+    <label class="form-label">Nombre de la receta *</label>
+    <input type="text" class="form-control" [(ngModel)]="nombreReceta" placeholder="Ej: Pinto Casero">
+  </div>
+
+  <!-- Buscador de productos -->
+  <div class="mb-3">
+    <label class="form-label">Buscar ingrediente</label>
+    <div class="input-group">
+      <input type="text" class="form-control" placeholder="Nombre o código de barras..."
+             [(ngModel)]="terminoBusqueda" (keyup.enter)="buscarProducto()">
+      <button class="btn btn-primary" (click)="buscarProducto()" [disabled]="buscandoProducto">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+
+    <!-- Resultados de búsqueda -->
+    <div *ngIf="productosEncontrados.length > 0" class="border rounded mt-2" style="max-height:180px; overflow-y:auto;">
+      <div *ngFor="let p of productosEncontrados"
+           class="d-flex justify-content-between align-items-center p-2 border-bottom"
+           style="cursor:pointer;" (click)="agregarIngrediente(p)">
+        <div>
+          <div class="small fw-medium">{{ p.descripcion }}</div>
+          <div class="text-muted" style="font-size:0.75rem;">{{ p.energiaKcal }} kcal | {{ p.tamanoPorcion }}{{ p.unidadMedida }}/porción</div>
+        </div>
+        <button class="btn btn-success btn-sm py-0">
+          <i class="bi bi-plus"></i>
+        </button>
+      </div>
+    </div>
+    <div *ngIf="buscandoProducto" class="text-center py-2">
+      <div class="spinner-border spinner-border-sm text-success"></div>
+    </div>
+  </div>
+
+  <!-- Tabla de ingredientes -->
+  <div *ngIf="ingredientes.length > 0">
+    <label class="form-label fw-semibold">Ingredientes</label>
+    <table class="table table-sm">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th style="width:120px;">Porciones</th>
+          <th>Calorías</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let ing of ingredientes; let i = index">
+          <td class="align-middle small">{{ ing.descripcion }}</td>
+          <td>
+            <input type="number" class="form-control form-control-sm"
+                   [(ngModel)]="ing.cantidadPorciones" min="0.1" step="0.1"
+                   (ngModelChange)="actualizarCalorias(ing, 0)">
+          </td>
+          <td class="align-middle small">{{ ing.caloriasAporte | number:'1.0-0' }} kcal</td>
+          <td class="align-middle">
+            <button class="btn btn-link text-danger btn-sm p-0" (click)="eliminarIngrediente(i)">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="2" class="text-end fw-semibold">Total estimado:</td>
+          <td class="fw-bold text-success">{{ caloriasTotal | number:'1.0-0' }} kcal</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div class="d-flex justify-content-end gap-2 mt-3">
+    <button class="btn btn-outline-secondary" (click)="cancelarFormulario()">Cancelar</button>
+    <button class="btn btn-primary" (click)="guardarReceta()" [disabled]="guardando">
+      <span *ngIf="guardando" class="spinner-border spinner-border-sm me-1"></span>
+      {{ editandoId ? 'Actualizar' : 'Guardar' }} Receta
+    </button>
+  </div>
+</div>
+
+<!-- =================== LISTA DE RECETAS =================== -->
+<div *ngIf="cargando" class="text-center py-4">
+  <div class="spinner-border text-success"></div>
+</div>
+
+<div *ngIf="!cargando && recetas.length === 0 && !mostrarFormulario" class="text-center py-5 text-muted">
+  <i class="bi bi-book fs-1"></i>
+  <p class="mt-2">No tiene recetas creadas aún.</p>
+  <button class="btn btn-primary" (click)="abrirFormulario()">Crear mi primera receta</button>
+</div>
+
+<div class="row g-3" *ngIf="!cargando && !mostrarFormulario">
+  <div class="col-md-6" *ngFor="let r of recetas">
+    <div class="card p-3 h-100">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <h6 class="fw-semibold mb-0">{{ r.nombreReceta }}</h6>
+        <div class="d-flex gap-1">
+          <button class="btn btn-outline-primary btn-sm" (click)="abrirFormulario(r)">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button class="btn btn-outline-danger btn-sm" (click)="eliminarReceta(r.idReceta!)">
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="row g-2 mb-3 small">
+        <div class="col-6">
+          <span class="text-muted">Calorías:</span>
+          <strong class="ms-1 text-success">{{ r.caloriasToTales }} kcal</strong>
+        </div>
+        <div class="col-6">
+          <span class="text-muted">Proteínas:</span>
+          <strong class="ms-1">{{ r.proteinasTotales }}g</strong>
+        </div>
+        <div class="col-6">
+          <span class="text-muted">Carbohidratos:</span>
+          <strong class="ms-1">{{ r.carbohidratosTotales }}g</strong>
+        </div>
+        <div class="col-6">
+          <span class="text-muted">Grasas:</span>
+          <strong class="ms-1">{{ r.grasasTotales }}g</strong>
+        </div>
+      </div>
+
+      <div *ngIf="r.detalles && r.detalles.length > 0">
+        <p class="text-muted small mb-1">Ingredientes:</p>
+        <ul class="list-unstyled mb-0">
+          <li *ngFor="let d of r.detalles" class="small">
+            <i class="bi bi-dot"></i>
+            {{ d.producto?.descripcion ?? d.productoCodigo }}
+            <span class="text-muted">({{ d.cantidadPorciones }} porciones)</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

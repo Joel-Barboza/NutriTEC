@@ -1,0 +1,13 @@
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  table {
+    font-size: 11px;
+  }
+
+  h5.print-only {
+    display: block !important;
+  }
+}
