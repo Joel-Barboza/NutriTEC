@@ -1,16 +1,27 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace SQL_API.DTOs
 {
     public class PlanCreateDto
     {
+        [Required]
         public string NombrePlan { get; set; } = string.Empty;
+
+        [Required]
         public string NutricionistaCodigo { get; set; } = string.Empty;
-        public List<PlanDetalleCreateDto> Detalles { get; set; } = new();
+
+        [Required]
+        public List<PlanDetalleDto> Detalles { get; set; } = new();
     }
 
-    public class PlanDetalleCreateDto
+    public class PlanDetalleDto
     {
+        [Required]
         public string TiempoComida { get; set; } = string.Empty;
+
+        [Required]
         public string ProductoCodigo { get; set; } = string.Empty;
-        public decimal Porciones { get; set; }
+
+        public int Porciones { get; set; }
     }
 }

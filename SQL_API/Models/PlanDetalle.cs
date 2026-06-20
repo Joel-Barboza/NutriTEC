@@ -17,7 +17,7 @@ namespace SQL_API.Models
         [Required]
         public string ProductoCodigo { get; set; } = string.Empty;
 
-        public decimal Porciones { get; set; }
+        public int Porciones { get; set; }
 
         public PlanAlimentacion? PlanAlimentacion { get; set; }
 

@@ -1,2 +1,139 @@
-<h2>Gestión de Planes</h2>
-<p>Componente de planes funcionando correctamente.</p>
+<div class="container-fluid">
+  <h2 class="mb-3">Gestión de Planes</h2>
+
+  <div *ngIf="mensajeExito" class="alert alert-success">
+    {{ mensajeExito }}
+  </div>
+
+  <div *ngIf="mensajeError" class="alert alert-danger">
+    {{ mensajeError }}
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header fw-bold">
+      Crear nuevo plan
+    </div>
+
+    <div class="card-body">
+      <div class="mb-3">
+        <label class="form-label">Nombre del plan</label>
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="nuevoPlan.nombrePlan"
+          placeholder="Ej: Plan pérdida de peso"
+        />
+      </div>
+
+      <div class="alert alert-info">
+        Calorías estimadas del plan:
+        <strong>{{ calcularTotalTemporal() | number:'1.0-0' }} kcal</strong>
+      </div>
+
+      <div *ngFor="let tiempo of tiemposComida" class="mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="mb-0">{{ tiempo }}</h5>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-primary"
+            (click)="agregarProducto(tiempo)"
+          >
+            Agregar producto
+          </button>
+        </div>
+
+        <div
+          *ngFor="let detalle of detallesPorTiempo(tiempo); let i = index"
+          class="row g-2 align-items-end mb-2"
+        >
+          <div class="col-md-7">
+            <label class="form-label">Producto</label>
+            <select class="form-select" [(ngModel)]="detalle.productoCodigo">
+              <option value="">Seleccione un producto</option>
+              <option
+                *ngFor="let producto of productos"
+                [value]="producto.codigoBarras"
+              >
+                {{ producto.descripcion }} - {{ producto.energiaKcal }} kcal
+              </option>
+            </select>
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label">Porciones</label>
+            <input
+              type="number"
+              class="form-control"
+              min="0.1"
+              step="0.1"
+              [(ngModel)]="detalle.porciones"
+            />
+          </div>
+
+          <div class="col-md-2">
+            <button
+              type="button"
+              class="btn btn-outline-danger w-100"
+              (click)="eliminarDetalle(nuevoPlan.detalles.indexOf(detalle))"
+            >
+              Eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="btn btn-success"
+        (click)="guardarPlan()"
+        [disabled]="guardando"
+      >
+        {{ guardando ? 'Guardando...' : 'Guardar plan' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header fw-bold">
+      Planes creados
+    </div>
+
+    <div class="card-body">
+      <div *ngIf="planes.length === 0" class="text-muted">
+        No hay planes registrados todavía.
+      </div>
+
+      <div *ngFor="let plan of planes" class="border rounded p-3 mb-3">
+        <div class="d-flex justify-content-between">
+          <div>
+            <h5>{{ plan.nombrePlan }}</h5>
+            <p class="mb-1">
+              Calorías totales:
+              <strong>{{ plan.caloriasTotales }} kcal</strong>
+            </p>
+          </div>
+
+          <button
+            class="btn btn-sm btn-outline-danger"
+            (click)="eliminarPlan(plan.idPlan)"
+          >
+            Eliminar
+          </button>
+        </div>
+
+        <div *ngFor="let tiempo of tiemposComida" class="mt-2">
+          <strong>{{ tiempo }}</strong>
+
+          <ul class="mb-2">
+            <li *ngFor="let detalle of plan.detalles">
+              <span *ngIf="detalle.tiempoComida === tiempo">
+                {{ detalle.producto?.descripcion || detalle.productoCodigo }}
+                - {{ detalle.porciones }} porción(es)
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
