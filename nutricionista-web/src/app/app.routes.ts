@@ -4,6 +4,7 @@ import { FeedBackComponent } from './components/feedback/feedback.component';
 import { LoginComponent } from './components/login/login.component';
 import { authGuard } from './guards/auth.guard';
 import { ProductosComponent } from './components/productos/productos.component';
+import { PlanesComponent } from './components/planes/planes.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -15,6 +16,7 @@ export const routes: Routes = [
     children: [
       { path: 'feedback', component: FeedBackComponent },
       { path: 'productos', component: ProductosComponent },
+      { path: 'planes', component: PlanesComponent },
       { path: '', redirectTo: 'productos', pathMatch: 'full' }
     ]
   },

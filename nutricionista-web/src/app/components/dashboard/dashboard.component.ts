@@ -14,8 +14,9 @@ import { Nutricionista } from '../../services/nutricionista.service';
 })
 export class DashboardComponent {
   menu = [
-    { nombre: 'Productos', valor: 'productos'},
-    { nombre: 'Retroalimentacion', valor: 'feedback' },
+  { nombre: 'Productos', valor: 'productos' },
+  { nombre: 'Gestión de Planes', valor: 'planes' },
+  { nombre: 'Retroalimentación', valor: 'feedback' },
   ];
 
   constructor(private router: Router, private authService: AuthService) {}

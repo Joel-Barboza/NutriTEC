@@ -15,7 +15,8 @@ namespace SQL_API.Models
         public DbSet<RecetaDetalle> RecetaDetalles { get; set; }
         public DbSet<ConsumoDiario> ConsumosDiarios { get; set; }
         public DbSet<PacienteNutricionista> PacientesNutricionistas { get; set; }
-
+        public DbSet<PlanAlimentacion> PlanesAlimentacion { get; set; }
+        public DbSet<PlanDetalle> PlanDetalles { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<RecetaDetalle>()
@@ -39,6 +40,16 @@ namespace SQL_API.Models
                 .WithMany()
                 .HasForeignKey(c => c.IdReceta)
                 .IsRequired(false);
+
+            modelBuilder.Entity<PlanDetalle>()
+                .HasOne(pd => pd.PlanAlimentacion)
+                .WithMany(p => p.Detalles)
+                .HasForeignKey(pd => pd.IdPlan);
+
+            modelBuilder.Entity<PlanDetalle>()
+                .HasOne(pd => pd.Producto)
+                .WithMany()
+                .HasForeignKey(pd => pd.ProductoCodigo);
         }
     }
 }
