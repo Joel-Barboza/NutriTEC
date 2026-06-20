@@ -22,7 +22,9 @@ export class RegistroMedidasComponent implements OnInit {
   mensajeExito = '';
   mensajeError = '';
 
-  formulario: RegistroMedidas = this.medidaVacia();
+
+  formulario!: RegistroMedidas;
+  // formulario: RegistroMedidas = this.medidaVacia();
 
   get email(): string {
     return this.auth.currentUser?.email ?? '';
@@ -31,11 +33,12 @@ export class RegistroMedidasComponent implements OnInit {
   constructor(
     private auth: AuthService,
     private medidasService: MedidasService
-  ) {}
+  ) { }
 
-  ngOnInit(): void {
-    this.cargarHistorial();
-  }
+ngOnInit(): void {
+  this.formulario = this.medidaVacia();
+  this.cargarHistorial();
+}
 
   cargarHistorial(): void {
     this.cargando = true;
@@ -108,7 +111,7 @@ export class RegistroMedidasComponent implements OnInit {
     if (!confirm('¿Desea eliminar este registro?')) return;
     this.medidasService.eliminarMedidas(id).subscribe({
       next: () => this.cargarHistorial(),
-      error: () => {}
+      error: () => { }
     });
   }
 

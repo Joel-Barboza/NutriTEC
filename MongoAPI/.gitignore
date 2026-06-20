@@ -1,3 +1,11 @@
+
+.vs
+bin
+obj
+appsettings.Development.json
+appsettings.json
+
+
 # Excluir secretos de Azure y Web Deploy
 **/Properties/PublishProfiles/
 **/Properties/serviceDependencies/
