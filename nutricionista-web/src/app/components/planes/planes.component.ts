@@ -31,6 +31,11 @@ export class PlanesComponent implements OnInit {
   mensajeError = '';
   guardando = false;
 
+  editando = false;
+  idPlanEditando: number | null = null;
+
+  planExpandidoId: number | null = null;
+
   constructor(
     private planService: PlanService,
     private productoService: ProductoService,
@@ -44,8 +49,12 @@ export class PlanesComponent implements OnInit {
 
   cargarProductos(): void {
     this.productoService.getAprobados().subscribe({
-      next: (productos) => this.productos = productos,
-      error: () => this.mensajeError = 'Error al cargar productos aprobados.'
+      next: (productos) => {
+        this.productos = productos;
+      },
+      error: () => {
+        this.mensajeError = 'Error al cargar productos aprobados.';
+      }
     });
   }
 
@@ -58,8 +67,12 @@ export class PlanesComponent implements OnInit {
     }
 
     this.planService.getPlanesPorNutricionista(codigo).subscribe({
-      next: (planes) => this.planes = planes,
-      error: () => this.mensajeError = 'Error al cargar planes.'
+      next: (planes) => {
+        this.planes = planes;
+      },
+      error: () => {
+        this.mensajeError = 'Error al cargar planes.';
+      }
     });
   }
 
@@ -75,15 +88,35 @@ export class PlanesComponent implements OnInit {
     this.nuevoPlan.detalles.splice(index, 1);
   }
 
-  detallesPorTiempo(tiempo: string): PlanDetalle[] {
+  detallesPorTiempoFormulario(tiempo: string): PlanDetalle[] {
     return this.nuevoPlan.detalles.filter(d => d.tiempoComida === tiempo);
+  }
+
+  detallesPorTiempoPlan(plan: PlanAlimentacion, tiempo: string): PlanDetalle[] {
+    return plan.detalles?.filter(d => d.tiempoComida === tiempo) ?? [];
   }
 
   calcularTotalTemporal(): number {
     return this.nuevoPlan.detalles.reduce((total, detalle) => {
-      const producto = this.productos.find(p => p.codigoBarras === detalle.productoCodigo);
-      return total + ((producto?.energiaKcal ?? 0) * detalle.porciones);
+      return total + this.calcularCaloriasDetalle(detalle);
     }, 0);
+  }
+
+  calcularCaloriasDetalle(detalle: PlanDetalle): number {
+    const producto = this.productos.find(p => p.codigoBarras === detalle.productoCodigo)
+      ?? detalle.producto;
+
+    const calorias = producto?.energiaKcal ?? 0;
+    const porciones = detalle.porciones ?? 0;
+
+    return calorias * porciones;
+  }
+
+  obtenerNombreProducto(detalle: PlanDetalle): string {
+    const producto = this.productos.find(p => p.codigoBarras === detalle.productoCodigo)
+      ?? detalle.producto;
+
+    return producto?.descripcion ?? detalle.productoCodigo;
   }
 
   guardarPlan(): void {
@@ -105,6 +138,11 @@ export class PlanesComponent implements OnInit {
       return;
     }
 
+    if (this.nuevoPlan.detalles.some(d => !d.porciones || d.porciones <= 0)) {
+      this.mensajeError = 'Las porciones deben ser mayores a cero.';
+      return;
+    }
+
     const codigo = this.auth.currentUser?.codigoNutricionista ?? '';
 
     if (!codigo) {
@@ -115,11 +153,28 @@ export class PlanesComponent implements OnInit {
     this.nuevoPlan.nutricionistaCodigo = codigo;
     this.guardando = true;
 
+    if (this.editando && this.idPlanEditando) {
+      this.planService.actualizarPlan(this.idPlanEditando, this.nuevoPlan).subscribe({
+        next: () => {
+          this.guardando = false;
+          this.mensajeExito = 'Plan actualizado correctamente.';
+          this.limpiarFormulario();
+          this.cargarPlanes();
+        },
+        error: (err) => {
+          this.guardando = false;
+          this.mensajeError = err?.error?.mensaje ?? 'Error al actualizar el plan.';
+        }
+      });
+
+      return;
+    }
+
     this.planService.crearPlan(this.nuevoPlan).subscribe({
       next: () => {
         this.guardando = false;
         this.mensajeExito = 'Plan creado correctamente.';
-        this.nuevoPlan = this.planVacio();
+        this.limpiarFormulario();
         this.cargarPlanes();
       },
       error: (err) => {
@@ -127,6 +182,36 @@ export class PlanesComponent implements OnInit {
         this.mensajeError = err?.error?.mensaje ?? 'Error al crear el plan.';
       }
     });
+  }
+
+  editarPlan(plan: PlanAlimentacion): void {
+    this.editando = true;
+    this.idPlanEditando = plan.idPlan ?? null;
+    this.mensajeExito = '';
+    this.mensajeError = '';
+
+    this.nuevoPlan = {
+      idPlan: plan.idPlan,
+      nombrePlan: plan.nombrePlan,
+      nutricionistaCodigo: plan.nutricionistaCodigo,
+      caloriasTotales: plan.caloriasTotales,
+      detalles: plan.detalles.map(d => ({
+        idPlanDetalle: d.idPlanDetalle,
+        idPlan: d.idPlan,
+        tiempoComida: d.tiempoComida,
+        productoCodigo: d.productoCodigo,
+        porciones: d.porciones,
+        producto: d.producto
+      }))
+    };
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  cancelarEdicion(): void {
+    this.limpiarFormulario();
+    this.mensajeError = '';
+    this.mensajeExito = '';
   }
 
   eliminarPlan(idPlan?: number): void {
@@ -139,8 +224,27 @@ export class PlanesComponent implements OnInit {
         this.mensajeExito = 'Plan eliminado correctamente.';
         this.cargarPlanes();
       },
-      error: () => this.mensajeError = 'Error al eliminar el plan.'
+      error: () => {
+        this.mensajeError = 'Error al eliminar el plan.';
+      }
     });
+  }
+
+  toggleDetallePlan(idPlan?: number): void {
+    if (!idPlan) return;
+
+    this.planExpandidoId = this.planExpandidoId === idPlan ? null : idPlan;
+  }
+
+  tieneDetallesEnTiempo(plan: PlanAlimentacion, tiempo: string): boolean {
+    return this.detallesPorTiempoPlan(plan, tiempo).length > 0;
+  }
+
+  private limpiarFormulario(): void {
+    this.nuevoPlan = this.planVacio();
+    this.editando = false;
+    this.idPlanEditando = null;
+    this.guardando = false;
   }
 
   private planVacio(): PlanAlimentacion {
