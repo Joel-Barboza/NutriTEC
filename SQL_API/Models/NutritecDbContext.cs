@@ -18,6 +18,9 @@ namespace SQL_API.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Producto>()
+                .ToTable(tb => tb.HasTrigger("TR_Producto_Aprobacion"));
+
             modelBuilder.Entity<RecetaDetalle>()
                 .HasOne(rd => rd.Receta)
                 .WithMany(r => r.Detalles)
