@@ -42,6 +42,11 @@ namespace SQL_API.Models
                 .WithMany()
                 .HasForeignKey(c => c.IdReceta)
                 .IsRequired(false);
+
+            // Tabla de asociación entre paciente y nutricionista.
+            // En la BD actual PacienteEmail es PRIMARY KEY, por eso se configura así.
+            modelBuilder.Entity<PacienteNutricionista>()
+                .HasKey(pn => pn.PacienteEmail);
         }
     }
 }

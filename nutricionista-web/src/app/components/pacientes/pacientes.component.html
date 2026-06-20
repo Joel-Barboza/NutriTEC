@@ -1,0 +1,153 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 class="fw-bold mb-1">
+      <i class="bi bi-people-fill me-2 text-success"></i>Pacientes
+    </h4>
+    <p class="text-muted mb-0">Busque clientes registrados y asígnelos a su lista de pacientes.</p>
+  </div>
+  <button class="btn btn-outline-primary btn-sm" (click)="cargarPacientesAsociados()" [disabled]="cargandoAsociados">
+    <span *ngIf="cargandoAsociados" class="spinner-border spinner-border-sm me-1"></span>
+    Refrescar lista
+  </button>
+</div>
+
+<div *ngIf="mensajeExito" class="alert alert-success alert-dismissible">
+  {{ mensajeExito }}
+  <button type="button" class="btn-close" (click)="mensajeExito=''" aria-label="Cerrar"></button>
+</div>
+
+<div *ngIf="mensajeError" class="alert alert-danger alert-dismissible">
+  {{ mensajeError }}
+  <button type="button" class="btn-close" (click)="mensajeError=''" aria-label="Cerrar"></button>
+</div>
+
+<!-- Búsqueda de clientes -->
+<div class="card p-3 mb-4">
+  <label class="form-label fw-semibold">Buscar cliente</label>
+  <div class="input-group">
+    <input
+      type="text"
+      class="form-control"
+      placeholder="Buscar por nombre, apellidos o correo electrónico..."
+      [(ngModel)]="terminoBusqueda"
+      (keyup.enter)="buscarPacientes()">
+    <button class="btn btn-primary" (click)="buscarPacientes()" [disabled]="buscando">
+      <span *ngIf="buscando" class="spinner-border spinner-border-sm me-1"></span>
+      <i *ngIf="!buscando" class="bi bi-search me-1"></i>
+      Buscar
+    </button>
+    <button class="btn btn-outline-secondary" (click)="limpiarBusqueda()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+  <small class="text-muted mt-2">
+    Si deja la búsqueda vacía, se mostrarán hasta 50 clientes registrados.
+  </small>
+</div>
+
+<!-- Pacientes asociados -->
+<div class="card p-4 mb-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="fw-bold mb-0">Mis pacientes asociados</h5>
+    <span class="badge bg-success">{{ pacientesAsociados.length }}</span>
+  </div>
+
+  <div *ngIf="cargandoAsociados" class="text-center py-4">
+    <div class="spinner-border text-success"></div>
+    <p class="text-muted mt-2 mb-0">Cargando pacientes asociados...</p>
+  </div>
+
+  <div *ngIf="!cargandoAsociados && pacientesAsociados.length === 0" class="empty-state">
+    <i class="bi bi-person-plus fs-2"></i>
+    <p class="mb-0 mt-2">Aún no tiene pacientes asociados.</p>
+  </div>
+
+  <div class="table-responsive" *ngIf="!cargandoAsociados && pacientesAsociados.length > 0">
+    <table class="table align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Paciente</th>
+          <th>Correo</th>
+          <th>País</th>
+          <th>IMC</th>
+          <th>Meta kcal</th>
+          <th>Fecha asociación</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let paciente of pacientesAsociados">
+          <td class="fw-semibold">{{ paciente.nombreCompleto }}</td>
+          <td>{{ paciente.pacienteEmail }}</td>
+          <td>{{ paciente.paisResidencia }}</td>
+          <td>{{ paciente.imc }}</td>
+          <td>{{ paciente.consumoMaxCalorias }}</td>
+          <td>{{ paciente.fechaAsociacion | date:'dd/MM/yyyy' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Resultados de búsqueda -->
+<div class="d-flex justify-content-between align-items-center mb-3" *ngIf="busquedaRealizada">
+  <h5 class="fw-bold mb-0">Resultados de búsqueda</h5>
+  <span class="text-muted small">{{ resultados.length }} resultado(s)</span>
+</div>
+
+<div *ngIf="buscando" class="text-center py-4">
+  <div class="spinner-border text-success"></div>
+</div>
+
+<div *ngIf="busquedaRealizada && !buscando && resultados.length === 0" class="empty-state card p-4">
+  <i class="bi bi-search fs-2"></i>
+  <p class="mb-0 mt-2">No se encontraron clientes con ese criterio.</p>
+</div>
+
+<div class="row g-3" *ngIf="busquedaRealizada && !buscando && resultados.length > 0">
+  <div class="col-md-6 col-xl-4" *ngFor="let paciente of resultados">
+    <div class="card h-100 p-3 paciente-card">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div>
+          <div class="fw-bold">{{ paciente.nombreCompleto }}</div>
+          <small class="text-muted">{{ paciente.email }}</small>
+        </div>
+        <span class="badge"
+          [ngClass]="paciente.asociadoAlNutricionista ? 'bg-success' : (estaAsociadoConOtroNutricionista(paciente) ? 'bg-warning text-dark' : 'bg-secondary')">
+          {{ paciente.asociadoAlNutricionista ? 'Asociado' : (estaAsociadoConOtroNutricionista(paciente) ? 'Con otro nutricionista' : 'Disponible') }}
+        </span>
+      </div>
+
+      <div class="row g-2 small text-muted mb-3">
+        <div class="col-6">
+          <span>País:</span>
+          <strong class="text-dark ms-1">{{ paciente.paisResidencia }}</strong>
+        </div>
+        <div class="col-6">
+          <span>Peso:</span>
+          <strong class="text-dark ms-1">{{ paciente.pesoActual }} kg</strong>
+        </div>
+        <div class="col-6">
+          <span>IMC:</span>
+          <strong class="text-dark ms-1">{{ paciente.imc }}</strong>
+        </div>
+        <div class="col-6">
+          <span>Meta:</span>
+          <strong class="text-dark ms-1">{{ paciente.consumoMaxCalorias }} kcal</strong>
+        </div>
+      </div>
+
+      <div *ngIf="estaAsociadoConOtroNutricionista(paciente)" class="alert alert-warning py-2 small mb-3">
+        Este cliente ya está asociado al nutricionista {{ paciente.nutricionistaActualCodigo }}.
+      </div>
+
+      <button
+        class="btn btn-primary w-100"
+        (click)="asociarPaciente(paciente)"
+        [disabled]="paciente.asociadoAlNutricionista || estaAsociadoConOtroNutricionista(paciente) || asociandoEmail === paciente.email">
+        <span *ngIf="asociandoEmail === paciente.email" class="spinner-border spinner-border-sm me-1"></span>
+        <i *ngIf="asociandoEmail !== paciente.email" class="bi bi-person-plus me-1"></i>
+        {{ paciente.asociadoAlNutricionista ? 'Ya está en mi lista' : 'Asociar paciente' }}
+      </button>
+    </div>
+  </div>
+</div>
