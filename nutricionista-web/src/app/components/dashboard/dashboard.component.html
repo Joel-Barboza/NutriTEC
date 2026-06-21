@@ -1,31 +1,37 @@
-<div class="dashboard-container">
-  <nav class="sidebar">
-    <div class="sidebar-brand">
-      <img src="assets/logo.png" alt="Logo NutriTEC" class="logo" />
-      <span class="brand-name">NutriTEC</span>
+<div class="d-flex" style="min-height:100vh;">
+  <!-- ======================== SIDEBAR ======================== -->
+  <nav class="sidebar d-flex flex-column p-3 no-print" style="width:240px; flex-shrink:0;">
+    <div class="text-center mb-4">
+      <div class="fs-4 fw-bold"><i class="bi bi-leaf-fill"></i> NutriTEC</div>
+      <small class="opacity-75">Portal Nutricionista</small>
     </div>
 
-    <div class="user-info" *ngIf="currentUser">
-      <div class="user-avatar">{{ currentUser.nombre.charAt(0) }}{{ currentUser.apellido1.charAt(0) }}</div>
-      <div class="user-details">
-        <span class="user-name">{{ currentUser.nombre }} {{ currentUser.apellido1 }}</span>
-        <span class="user-email">{{ currentUser.email }}</span>
-      </div>
+    <div class="mb-3 px-2" *ngIf="currentUser">
+      <div class="fw-semibold">{{ currentUser.nombre }} {{ currentUser.apellido1 }}</div>
+      <small class="opacity-75">{{ currentUser.email }}</small>
     </div>
 
-    <ul class="nav-menu">
-      <li *ngFor="let item of menu" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: false }">
-        <a [routerLink]="['/dashboard', item.valor]">{{ item.nombre }}</a>
+    <hr class="border-light">
+
+    <ul class="nav flex-column flex-grow-1">
+      <li class="nav-item" *ngFor="let item of menu">
+        <a class="nav-link" [routerLink]="['/dashboard', item.valor]" routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: false }">
+          <!-- <i class="bi me-2" [ngClass]="item.icono ?? 'bi-circle'"></i> -->
+          {{ item.nombre }}
+        </a>
       </li>
     </ul>
 
-    <button class="btn-logout" (click)="cerrarSesion()">Cerrar Sesion</button>
+    <div class="mt-auto">
+      <button class="btn btn-outline-light btn-sm w-100" (click)="cerrarSesion()">
+        <i class="bi bi-box-arrow-left me-2"></i>Cerrar Sesión
+      </button>
+    </div>
   </nav>
 
-  <main class="main-content">
-    <div class="content-header">
-      <h1>{{ seccionActual }}</h1>
-    </div>
+  <!-- ======================== MAIN CONTENT ======================== -->
+  <main class="flex-grow-1 page-content">
     <router-outlet />
   </main>
 </div>

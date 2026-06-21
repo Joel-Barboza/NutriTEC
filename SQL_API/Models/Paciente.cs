@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SQL_API.Models
@@ -15,6 +15,12 @@ namespace SQL_API.Models
         public string PaisResidencia { get; set; } = null!;
         public decimal PesoInicial { get; set; }
         public decimal PesoActual { get; set; }
+        public decimal IMC { get; set; }
+        public decimal Cintura { get; set; }
+        public decimal Cuello { get; set; }
+        public decimal Caderas { get; set; }
+        public decimal PorcentajeMusculo { get; set; }
+        public decimal PorcentajeGrasa { get; set; }
         public int ConsumoMaxCalorias { get; set; }
         public string PasswordEncriptado { get; set; } = null!;
     }

@@ -1,0 +1,97 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="fw-bold mb-0"><i class="bi bi-rulers me-2 text-success"></i>Mis Medidas</h4>
+  <button *ngIf="!mostrarFormulario" class="btn btn-primary btn-sm" (click)="abrirFormulario()">
+    <i class="bi bi-plus-lg me-1"></i>Registrar Medidas
+  </button>
+</div>
+
+<!-- Mensajes -->
+<div *ngIf="mensajeExito" class="alert alert-success py-2">{{ mensajeExito }}</div>
+<div *ngIf="mensajeError" class="alert alert-danger py-2">{{ mensajeError }}</div>
+
+<!-- Formulario -->
+<div *ngIf="mostrarFormulario" class="card p-4 mb-4">
+  <h6 class="fw-semibold mb-3">{{ editandoId ? 'Editar' : 'Nuevo' }} Registro de Medidas</h6>
+
+  <div class="row g-3">
+    <div class="col-md-4">
+      <label class="form-label">Fecha *</label>
+      <input type="date" class="form-control" [(ngModel)]="formulario.fecha">
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Cintura (cm)</label>
+      <input type="number" class="form-control" [(ngModel)]="formulario.cintura" step="0.1">
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Cuello (cm)</label>
+      <input type="number" class="form-control" [(ngModel)]="formulario.cuello" step="0.1">
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Caderas (cm)</label>
+      <input type="number" class="form-control" [(ngModel)]="formulario.caderas" step="0.1">
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">% Músculo</label>
+      <input type="number" class="form-control" [(ngModel)]="formulario.porcentajeMusculo" step="0.1">
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">% Grasa</label>
+      <input type="number" class="form-control" [(ngModel)]="formulario.porcentajeGrasa" step="0.1">
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-end gap-2 mt-4">
+    <button class="btn btn-outline-secondary" (click)="cancelar()">Cancelar</button>
+    <button class="btn btn-primary" (click)="guardar()" [disabled]="guardando">
+      <span *ngIf="guardando" class="spinner-border spinner-border-sm me-1"></span>
+      {{ editandoId ? 'Actualizar' : 'Guardar' }}
+    </button>
+  </div>
+</div>
+
+<!-- Historial -->
+<div *ngIf="cargando" class="text-center py-4">
+  <div class="spinner-border text-success"></div>
+</div>
+
+<div *ngIf="!cargando && historial.length === 0 && !mostrarFormulario" class="text-center py-5 text-muted">
+  <i class="bi bi-rulers fs-1"></i>
+  <p class="mt-2">No tiene medidas registradas.</p>
+  <button class="btn btn-primary" (click)="abrirFormulario()">Registrar mis primeras medidas</button>
+</div>
+
+<div *ngIf="!cargando && historial.length > 0" class="card p-0 overflow-hidden">
+  <table class="table table-hover mb-0">
+    <thead class="table-success">
+      <tr>
+        <th>Fecha</th>
+        <th>Cintura</th>
+        <th>Cuello</th>
+        <th>Caderas</th>
+        <th>% Músculo</th>
+        <th>% Grasa</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let m of historial">
+        <td>{{ m.fecha | date:'dd/MM/yyyy' }}</td>
+        <td>{{ m.cintura }} cm</td>
+        <td>{{ m.cuello }} cm</td>
+        <td>{{ m.caderas }} cm</td>
+        <td>{{ m.porcentajeMusculo }}%</td>
+        <td>{{ m.porcentajeGrasa }}%</td>
+        <td>
+          <div class="d-flex gap-1">
+            <button class="btn btn-outline-primary btn-sm" (click)="abrirFormulario(m)">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-outline-danger btn-sm" (click)="eliminar(m.idRegistro!)">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

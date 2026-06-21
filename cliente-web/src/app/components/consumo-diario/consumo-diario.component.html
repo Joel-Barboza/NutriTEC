@@ -1,0 +1,175 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="fw-bold mb-0"><i class="bi bi-journal-check me-2 text-success"></i>Registro Diario</h4>
+  <div class="d-flex align-items-center gap-2">
+    <label class="form-label mb-0 text-muted">Fecha:</label>
+    <input type="date" class="form-control form-control-sm" style="width:170px;"
+           [(ngModel)]="fechaSeleccionada" (change)="cargarResumen()">
+  </div>
+</div>
+
+<!-- Resumen calórico del día -->
+<div class="card p-3 mb-4">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <div>
+      <span class="fw-semibold">Calorías del día</span>
+      <span class="ms-2 text-muted small">Máx: {{ consumoMaximo }} kcal</span>
+    </div>
+    <span class="fw-bold fs-5"
+          [class.text-success]="porcentajeConsumo < 85"
+          [class.text-warning]="porcentajeConsumo >= 85 && porcentajeConsumo < 100"
+          [class.text-danger]="porcentajeConsumo >= 100">
+      {{ totalCaloriasDia }} / {{ consumoMaximo }} kcal
+    </span>
+  </div>
+  <div class="progress" style="height:10px;">
+    <div class="progress-bar"
+         [class.bg-success]="porcentajeConsumo < 85"
+         [class.bg-warning]="porcentajeConsumo >= 85 && porcentajeConsumo < 100"
+         [class.bg-danger]="porcentajeConsumo >= 100"
+         [style.width]="porcentajeConsumo + '%'">
+    </div>
+  </div>
+</div>
+
+<!-- Mensajes -->
+<div *ngIf="mensajeExito" class="alert alert-success py-2">{{ mensajeExito }}</div>
+<div *ngIf="mensajeError" class="alert alert-danger py-2">{{ mensajeError }}</div>
+
+<div class="row g-3">
+  <!-- Panel izquierdo: tiempos de comida -->
+  <div class="col-lg-7">
+    <div *ngIf="cargandoResumen" class="text-center py-4">
+      <div class="spinner-border text-success"></div>
+    </div>
+
+    <div *ngFor="let tiempo of tiempos" class="card mb-3 p-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="mb-0 fw-semibold">{{ tiempo }}</h6>
+        <span class="badge bg-success">
+          {{ getResumenPorTiempo(tiempo)?.totalCalorias ?? 0 }} kcal
+        </span>
+      </div>
+
+      <div *ngIf="getResumenPorTiempo(tiempo)?.items?.length; else vacio">
+        <div *ngFor="let item of getResumenPorTiempo(tiempo)?.items"
+             class="d-flex justify-content-between align-items-center py-1 border-bottom">
+          <div>
+            <span class="fw-medium">{{ item.nombre }}</span>
+            <span class="text-muted small ms-2">x{{ item.cantidad }}</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="text-muted small">{{ item.calorias }} kcal</span>
+            <button class="btn btn-link btn-sm text-danger p-0" (click)="eliminarItem(item.idConsumo)">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #vacio>
+        <p class="text-muted small mb-0 py-1">Sin registros para este tiempo.</p>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Panel derecho: agregar item -->
+  <div class="col-lg-5">
+    <div class="card p-3 sticky-top" style="top:1rem;">
+      <h6 class="fw-semibold mb-3"><i class="bi bi-plus-circle me-2"></i>Agregar al Registro</h6>
+
+      <!-- Tiempo de comida -->
+      <div class="mb-3">
+        <label class="form-label small fw-semibold">Tiempo de comida</label>
+        <select class="form-select form-select-sm" [(ngModel)]="tiempoSeleccionado">
+          <option *ngFor="let t of tiempos" [value]="t">{{ t }}</option>
+        </select>
+      </div>
+
+      <!-- Tipo de búsqueda -->
+      <div class="btn-group w-100 mb-3">
+        <button class="btn btn-sm"
+                [class.btn-primary]="tipoBusqueda === 'producto'"
+                [class.btn-outline-primary]="tipoBusqueda !== 'producto'"
+                (click)="tipoBusqueda='producto'; itemSeleccionado=null; productosEncontrados=[]">
+          <i class="bi bi-upc-scan me-1"></i>Producto
+        </button>
+        <button class="btn btn-sm"
+                [class.btn-primary]="tipoBusqueda === 'receta'"
+                [class.btn-outline-primary]="tipoBusqueda !== 'receta'"
+                (click)="tipoBusqueda='receta'; itemSeleccionado=null">
+          <i class="bi bi-book me-1"></i>Receta
+        </button>
+      </div>
+
+      <!-- Búsqueda de producto -->
+      <div *ngIf="tipoBusqueda === 'producto'" class="mb-3">
+        <div class="input-group input-group-sm">
+          <input type="text" class="form-control" placeholder="Nombre o código..."
+                 [(ngModel)]="terminoBusqueda" (keyup.enter)="buscarProductos()">
+          <button class="btn btn-primary" (click)="buscarProductos()" [disabled]="buscando">
+            <i class="bi bi-search"></i>
+          </button>
+        </div>
+
+        <div class="mt-2" style="max-height:200px; overflow-y:auto;">
+          <div *ngIf="buscando" class="text-center py-2">
+            <div class="spinner-border spinner-border-sm text-success"></div>
+          </div>
+          <div *ngFor="let p of productosEncontrados"
+               class="d-flex justify-content-between align-items-center p-2 border-bottom"
+               style="cursor:pointer;"
+               [class.bg-light]="esProducto(itemSeleccionado) && itemSeleccionado.codigoBarras === p.codigoBarras"
+               (click)="seleccionarItem(p)">
+            <div>
+              <div class="small fw-medium">{{ p.descripcion }}</div>
+              <div class="text-muted" style="font-size:0.75rem;">{{ p.energiaKcal }} kcal/porción</div>
+            </div>
+            <i class="bi bi-check-circle-fill text-success"
+               *ngIf="esProducto(itemSeleccionado) && itemSeleccionado.codigoBarras === p.codigoBarras"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Selección de receta -->
+      <div *ngIf="tipoBusqueda === 'receta'" class="mb-3">
+        <div style="max-height:220px; overflow-y:auto;">
+          <div *ngFor="let r of recetasDisponibles"
+               class="d-flex justify-content-between align-items-center p-2 border-bottom"
+               style="cursor:pointer;"
+               [class.bg-light]="esReceta(itemSeleccionado) && itemSeleccionado.idReceta === r.idReceta"
+               (click)="seleccionarItem(r)">
+            <div>
+              <div class="small fw-medium">{{ r.nombreReceta }}</div>
+              <div class="text-muted" style="font-size:0.75rem;">{{ r.caloriasToTales }} kcal</div>
+            </div>
+            <i class="bi bi-check-circle-fill text-success"
+               *ngIf="esReceta(itemSeleccionado) && itemSeleccionado.idReceta === r.idReceta"></i>
+          </div>
+          <div *ngIf="recetasDisponibles.length === 0" class="text-muted small p-2">
+            No tiene recetas creadas.
+          </div>
+        </div>
+      </div>
+
+      <!-- Item seleccionado -->
+      <div *ngIf="itemSeleccionado" class="bg-light rounded p-2 mb-3 small">
+        <strong>{{ esProducto(itemSeleccionado) ? itemSeleccionado.descripcion : itemSeleccionado.nombreReceta }}</strong>
+        <div class="text-muted">
+          {{ esProducto(itemSeleccionado) ? itemSeleccionado.energiaKcal : itemSeleccionado.caloriasToTales }} kcal por porción
+        </div>
+      </div>
+
+      <!-- Cantidad -->
+      <div class="mb-3">
+        <label class="form-label small fw-semibold">Porciones</label>
+        <input type="number" class="form-control form-control-sm" [(ngModel)]="cantidad" min="0.5" step="0.5">
+      </div>
+
+      <button class="btn btn-primary w-100" (click)="agregarAlRegistro()" [disabled]="guardando || !itemSeleccionado">
+        <span *ngIf="guardando" class="spinner-border spinner-border-sm me-1"></span>
+        <i class="bi bi-plus-lg me-1" *ngIf="!guardando"></i>
+        Agregar
+      </button>
+    </div>
+  </div>
+</div>

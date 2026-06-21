@@ -14,11 +14,13 @@ import { Nutricionista } from '../../services/nutricionista.service';
 })
 export class DashboardComponent {
   menu = [
-    { nombre: 'Productos', valor: 'productos'},
-    { nombre: 'Retroalimentacion', valor: 'feedback' },
+    { nombre: 'Productos', valor: 'productos' },
+    { nombre: 'Pacientes', valor: 'pacientes' },
+    { nombre: 'Gestión de Planes', valor: 'planes' },
+    { nombre: 'Retroalimentación', valor: 'feedback' },
   ];
 
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(private router: Router, private authService: AuthService) { }
   // constructor(private router: Router) {}
 
   get currentUser(): Nutricionista | null {

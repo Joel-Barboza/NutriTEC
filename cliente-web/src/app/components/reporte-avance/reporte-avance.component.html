@@ -1,0 +1,147 @@
+<!-- Controles (no se imprimen) -->
+<div class="no-print">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0">
+      <i class="bi bi-bar-chart-line me-2 text-success"></i>Reporte de Avance
+    </h4>
+    <button *ngIf="registros.length > 0" class="btn btn-outline-primary btn-sm" (click)="exportarPDF()">
+      <i class="bi bi-file-earmark-pdf me-1"></i>Exportar PDF
+    </button>
+  </div>
+
+  <div *ngIf="mensajeError" class="alert alert-danger py-2">{{ mensajeError }}</div>
+
+  <div class="card p-3 mb-4">
+    <div class="row g-3 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label fw-semibold">Fecha Inicio</label>
+        <input type="date" class="form-control" [(ngModel)]="fechaInicio">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold">Fecha Fin</label>
+        <input type="date" class="form-control" [(ngModel)]="fechaFin">
+      </div>
+      <div class="col-md-4">
+        <button class="btn btn-primary w-100" (click)="buscar()" [disabled]="cargando">
+          <span *ngIf="cargando" class="spinner-border spinner-border-sm me-1"></span>
+          <i class="bi bi-search me-1" *ngIf="!cargando"></i>
+          Generar Reporte
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============== REPORTE (se imprime) ============== -->
+<div *ngIf="buscado">
+  <!-- Encabezado del reporte -->
+  <div class="mb-4">
+    <h5 class="fw-bold print-only" style="display:none;">NutriTEC — Reporte de Avance</h5>
+    <div class="text-muted small">
+      <strong>Paciente:</strong> {{ nombrePaciente }}
+      &nbsp;|&nbsp;
+      <strong>Período:</strong> {{ fechaInicio | date:'dd/MM/yyyy' }} — {{ fechaFin | date:'dd/MM/yyyy' }}
+    </div>
+  </div>
+
+  <!-- Sin datos -->
+  <div *ngIf="registros.length === 0" class="text-center py-5 text-muted no-print">
+    <i class="bi bi-inbox fs-1"></i>
+    <p class="mt-2">No hay registros de medidas en el período seleccionado.</p>
+  </div>
+
+  <!-- Tabla de medidas -->
+  <div *ngIf="registros.length > 0" class="card p-0 overflow-hidden">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0 table-reporte">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Cintura (cm)</th>
+            <th>Cuello (cm)</th>
+            <th>Caderas (cm)</th>
+            <th>% Músculo</th>
+            <th>% Grasa</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of registros; let i = index">
+            <td class="fw-medium">{{ r.fecha | date:'dd/MM/yyyy' }}</td>
+
+            <td>
+              {{ r.cintura }}
+              <small *ngIf="variacion('cintura', i) !== null"
+                     [class]="claseBadge(variacion('cintura', i), 'cintura')">
+                ({{ (variacion('cintura', i) ?? 0) > 0 ? '+' : '' }}{{ variacion('cintura', i) }})
+              </small>
+            </td>
+
+            <td>
+              {{ r.cuello }}
+              <small *ngIf="variacion('cuello', i) !== null"
+                     [class]="claseBadge(variacion('cuello', i), 'cuello')">
+                ({{ (variacion('cuello', i) ?? 0) > 0 ? '+' : '' }}{{ variacion('cuello', i) }})
+              </small>
+            </td>
+
+            <td>
+              {{ r.caderas }}
+              <small *ngIf="variacion('caderas', i) !== null"
+                     [class]="claseBadge(variacion('caderas', i), 'caderas')">
+                ({{ (variacion('caderas', i) ?? 0) > 0 ? '+' : '' }}{{ variacion('caderas', i) }})
+              </small>
+            </td>
+
+            <td>
+              {{ r.porcentajeMusculo }}%
+              <small *ngIf="variacion('porcentajeMusculo', i) !== null"
+                     [class]="claseBadge(variacion('porcentajeMusculo', i), 'porcentajeMusculo')">
+                ({{ (variacion('porcentajeMusculo', i) ?? 0) > 0 ? '+' : '' }}{{ variacion('porcentajeMusculo', i) }})
+              </small>
+            </td>
+
+            <td>
+              {{ r.porcentajeGrasa }}%
+              <small *ngIf="variacion('porcentajeGrasa', i) !== null"
+                     [class]="claseBadge(variacion('porcentajeGrasa', i), 'porcentajeGrasa')">
+                ({{ (variacion('porcentajeGrasa', i) ?? 0) > 0 ? '+' : '' }}{{ variacion('porcentajeGrasa', i) }})
+              </small>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot *ngIf="registros.length >= 2">
+          <tr class="table-light fw-semibold">
+            <td>Variación total</td>
+            <td [class]="claseBadge(registros[registros.length-1].cintura - registros[0].cintura, 'cintura')">
+              {{ (registros[registros.length-1].cintura - registros[0].cintura) > 0 ? '+' : '' }}
+              {{ (registros[registros.length-1].cintura - registros[0].cintura).toFixed(2) }} cm
+            </td>
+            <td [class]="claseBadge(registros[registros.length-1].cuello - registros[0].cuello, 'cuello')">
+              {{ (registros[registros.length-1].cuello - registros[0].cuello) > 0 ? '+' : '' }}
+              {{ (registros[registros.length-1].cuello - registros[0].cuello).toFixed(2) }} cm
+            </td>
+            <td [class]="claseBadge(registros[registros.length-1].caderas - registros[0].caderas, 'caderas')">
+              {{ (registros[registros.length-1].caderas - registros[0].caderas) > 0 ? '+' : '' }}
+              {{ (registros[registros.length-1].caderas - registros[0].caderas).toFixed(2) }} cm
+            </td>
+            <td [class]="claseBadge(registros[registros.length-1].porcentajeMusculo - registros[0].porcentajeMusculo, 'porcentajeMusculo')">
+              {{ (registros[registros.length-1].porcentajeMusculo - registros[0].porcentajeMusculo) > 0 ? '+' : '' }}
+              {{ (registros[registros.length-1].porcentajeMusculo - registros[0].porcentajeMusculo).toFixed(2) }}%
+            </td>
+            <td [class]="claseBadge(registros[registros.length-1].porcentajeGrasa - registros[0].porcentajeGrasa, 'porcentajeGrasa')">
+              {{ (registros[registros.length-1].porcentajeGrasa - registros[0].porcentajeGrasa) > 0 ? '+' : '' }}
+              {{ (registros[registros.length-1].porcentajeGrasa - registros[0].porcentajeGrasa).toFixed(2) }}%
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- Botón exportar en la parte inferior (no-print) -->
+  <div class="text-end mt-3 no-print" *ngIf="registros.length > 0">
+    <button class="btn btn-primary" (click)="exportarPDF()">
+      <i class="bi bi-file-earmark-pdf me-2"></i>Exportar a PDF
+    </button>
+  </div>
+</div>

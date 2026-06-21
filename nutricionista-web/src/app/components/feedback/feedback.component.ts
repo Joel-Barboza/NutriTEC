@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 interface Respuesta {
   autor: string;
@@ -32,7 +33,8 @@ export class FeedBackComponent implements OnInit {
   private http = inject(HttpClient);
   
   // URL de tu API en Azure
-  private apiUrl = 'https://mongoapi20260614023630-eugvc7dxf5fqh2cp.eastus2-01.azurewebsites.net/api/Feedback';
+  private apiUrl = `${environment.mongoApiUrl}/Feedback`;
+  // private apiUrl = 'https://mongoapi20260614023630-eugvc7dxf5fqh2cp.eastus2-01.azurewebsites.net/api/Feedback';
 
   // El signal empieza vacío y con un estado de carga opcional
   protected hilos = signal<Retroalimentacion[]>([]);

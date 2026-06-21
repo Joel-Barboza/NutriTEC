@@ -1,0 +1,78 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="fw-bold mb-0"><i class="bi bi-upc-scan me-2 text-success"></i>Productos</h4>
+  <button class="btn btn-primary btn-sm" (click)="cargarPendientes()">
+    <!-- <i class="bi" [class.bi-plus-lg]="!mostrarFormulario" [class.bi-x-lg]="mostrarFormulario"></i> -->
+    &#8635; Actualizar
+  </button>
+</div>
+
+<!-- Mensajes -->
+<div *ngIf="mensajeExito" class="alert alert-success alert-dismissible">
+  {{ mensajeExito }}
+  <button type="button" class="btn-close" (click)="mensajeExito=''"></button>
+</div>
+<div *ngIf="mensajeError" class="alert alert-danger alert-dismissible">
+  {{ mensajeError }}
+  <button type="button" class="btn-close" (click)="mensajeError=''"></button>
+</div>
+
+<!-- Lista de productos -->
+<div *ngIf="buscando" class="text-center py-4">
+  <div class="spinner-border text-success"></div>
+</div>
+
+<div *ngIf="sinResultados && !buscando" class="text-center py-4 text-muted">
+  <i class="bi bi-search fs-2"></i>
+  <p class="mt-2">No se encontraron productos con ese término.</p>
+</div>
+
+<div class="row g-3" *ngIf="!buscando">
+  <div class="col-md-6 col-lg-4" *ngFor="let p of resultados">
+    <div class="card h-100 p-3">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div class="fw-semibold">{{ p.descripcion }}</div>
+        <span class="badge bg-secondary small">{{ p.codigoBarras }}</span>
+      </div>
+      <div class="text-muted small mb-2">
+        {{ p.tamanoPorcion }}{{ p.unidadMedida }} por porción
+      </div>
+      <div class="row g-1 small">
+        <div class="col-6">
+          <span class="text-muted">Energía:</span>
+          <strong class="ms-1">{{ p.energiaKcal }} kcal</strong>
+        </div>
+        <div class="col-6">
+          <span class="text-muted">Proteína:</span>
+          <strong class="ms-1">{{ p.proteinaG }}g</strong>
+        </div>
+        <div class="col-6">
+          <span class="text-muted">Carbohidratos:</span>
+          <strong class="ms-1">{{ p.carbohidratosG }}g</strong>
+        </div>
+        <div class="col-6">
+          <span class="text-muted">Grasa:</span>
+          <strong class="ms-1">{{ p.grasaG }}g</strong>
+        </div>
+        <div class="col-12" *ngIf="p.vitaminas">
+          <span class="text-muted">Vitaminas:</span>
+          <span class="ms-1">{{ p.vitaminas }}</span>
+        </div>
+      </div>
+
+      <!-- Acciones de aprobación -->
+      <div class="d-flex gap-2 mt-3">
+        <button class="btn btn-success btn-sm flex-grow-1" (click)="aprobarProducto(p)">
+          <i class="bi bi-check-lg me-1"></i>Aprobar
+        </button>
+        <button class="btn btn-outline-danger btn-sm flex-grow-1" (click)="rechazarProducto(p)">
+          <i class="bi bi-x-lg me-1"></i>Descartar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="!buscando && resultados.length === 0 && !sinResultados" class="text-center py-4 text-muted">
+  <i class="bi bi-inbox fs-2"></i>
+  <p class="mt-2">No hay productos disponibles.</p>
+</div>
