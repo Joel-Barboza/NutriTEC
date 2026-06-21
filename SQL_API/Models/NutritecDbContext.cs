@@ -19,6 +19,9 @@ namespace SQL_API.Models
         public DbSet<PlanDetalle> PlanDetalles { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Producto>()
+                .ToTable(tb => tb.HasTrigger("TR_Producto_Aprobacion"));
+
             modelBuilder.Entity<RecetaDetalle>()
                 .HasOne(rd => rd.Receta)
                 .WithMany(r => r.Detalles)
@@ -50,6 +53,10 @@ namespace SQL_API.Models
                 .HasOne(pd => pd.Producto)
                 .WithMany()
                 .HasForeignKey(pd => pd.ProductoCodigo);
+            // Tabla de asociación entre paciente y nutricionista.
+            // En la BD actual PacienteEmail es PRIMARY KEY, por eso se configura así.
+            modelBuilder.Entity<PacienteNutricionista>()
+                .HasKey(pn => pn.PacienteEmail);
         }
     }
 }

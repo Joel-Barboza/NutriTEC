@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface ConsumoDiario {
   idConsumo?: number;
@@ -22,7 +23,8 @@ export interface ResumenComida {
 
 @Injectable({ providedIn: 'root' })
 export class ConsumoService {
-  private apiUrl = 'https://sqlapi20260610230651-hea3g5bkguh0edd7.eastus2-01.azurewebsites.net/api/consumodiario';
+  private apiUrl = `${environment.sqlApiUrl}/consumodiario`;
+  // private apiUrl = 'https://sqlapi20260610230651-hea3g5bkguh0edd7.eastus2-01.azurewebsites.net/api/consumodiario';
 
   constructor(private http: HttpClient) {}
 

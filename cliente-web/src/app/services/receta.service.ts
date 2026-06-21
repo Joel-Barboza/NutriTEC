@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface RecetaDetalle {
   idRecetaDetalle?: number;
@@ -29,7 +30,8 @@ export interface RecetaCreateDto {
 
 @Injectable({ providedIn: 'root' })
 export class RecetaService {
-  private apiUrl = 'https://sqlapi20260610230651-hea3g5bkguh0edd7.eastus2-01.azurewebsites.net/api/receta';
+  private apiUrl = `${environment.sqlApiUrl}/producto`;
+  // private apiUrl = 'https://sqlapi20260610230651-hea3g5bkguh0edd7.eastus2-01.azurewebsites.net/api/receta';
 
   constructor(private http: HttpClient) {}
 

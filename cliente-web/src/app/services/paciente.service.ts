@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface Paciente {
   email: string;
@@ -23,7 +24,8 @@ export interface Paciente {
 
 @Injectable({ providedIn: 'root' })
 export class PacienteService {
-  private apiUrl = 'https://sqlapi20260610230651-hea3g5bkguh0edd7.eastus2-01.azurewebsites.net/api/paciente';
+  private apiUrl = `${environment.sqlApiUrl}/paciente`;
+  // private apiUrl = 'https://sqlapi20260610230651-hea3g5bkguh0edd7.eastus2-01.azurewebsites.net/api/paciente';
 
   constructor(private http: HttpClient) {}
 

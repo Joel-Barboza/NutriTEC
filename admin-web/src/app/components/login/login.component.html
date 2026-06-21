@@ -1,0 +1,160 @@
+<div class="login-wrapper">
+  <div class="login-card">
+    <!-- Logo / Header -->
+    <div class="text-center mb-4">
+      <h2 class="fw-bold" style="color: #1b5e20;">
+        <i class="bi bi-leaf-fill me-2"></i>NutriTEC
+      </h2>
+      <p class="text-muted mb-0">Inicio sesión Administrador</p>
+    </div>
+
+
+    <!-- Tabs
+    <ul class="nav nav-pills nav-fill mb-4">
+      <li class="nav-item">
+        <button class="nav-link" [class.active]="modo === 'login'" (click)="cambiarModo('login')">
+          Iniciar Sesión
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" [class.active]="modo === 'registro'" (click)="cambiarModo('registro')">
+          Registrarse
+        </button>
+      </li>
+    </ul> -->
+
+    <!-- Alertas globales -->
+    <div *ngIf="error" class="alert alert-danger py-2">{{ error }}</div>
+    <div *ngIf="mensaje" class="alert alert-success py-2">{{ mensaje }}</div>
+    <div *ngIf="emailNoEncontrado" class="alert alert-warning py-2">
+      Correo o contraseña incorrectos.
+    </div>
+    <div *ngIf="emailYaRegistrado" class="alert alert-warning py-2">
+      Ya existe una cuenta con ese correo.
+    </div>
+
+    <!-- ===================== LOGIN ===================== -->
+    <div *ngIf="modo === 'login'">
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Correo electrónico</label>
+        <input type="email" class="form-control" [(ngModel)]="loginEmail" placeholder="correo@ejemplo.com">
+      </div>
+      <div class="mb-4">
+        <label class="form-label fw-semibold">Contraseña</label>
+        <input type="password" class="form-control" [(ngModel)]="loginPassword" placeholder="••••••••"
+               (keyup.enter)="iniciarSesion()">
+      </div>
+      <button class="btn btn-primary w-100" (click)="iniciarSesion()" [disabled]="cargando">
+        <span *ngIf="cargando" class="spinner-border spinner-border-sm me-2"></span>
+        Ingresar
+      </button>
+    </div>
+
+    <!-- ===================== REGISTRO =====================
+    <div *ngIf="modo === 'registro'">
+      Indicador de pasos
+      <div class="step-indicator justify-content-center mb-4">
+        <div class="step" [class.active]="paso === 1" [class.done]="paso > 1">1</div>
+        <div class="step" [class.active]="paso === 2" [class.done]="paso > 2">2</div>
+        <div class="step" [class.active]="paso === 3">3</div>
+      </div>
+
+      PASO 1: Datos personales
+      <div *ngIf="paso === 1">
+        <h6 class="text-muted mb-3">Paso 1 — Datos Personales</h6>
+        <div class="row g-2">
+          <div class="col-12">
+            <label class="form-label">Nombre *</label>
+            <input type="text" class="form-control" [(ngModel)]="formulario.nombre" placeholder="Nombre">
+          </div>
+          <div class="col-6">
+            <label class="form-label">Primer Apellido *</label>
+            <input type="text" class="form-control" [(ngModel)]="formulario.apellido1">
+          </div>
+          <div class="col-6">
+            <label class="form-label">Segundo Apellido *</label>
+            <input type="text" class="form-control" [(ngModel)]="formulario.apellido2">
+          </div>
+          <div class="col-6">
+            <label class="form-label">Fecha Nacimiento *</label>
+            <input type="date" class="form-control" [(ngModel)]="formulario.fechaNacimiento">
+          </div>
+          <div class="col-6">
+            <label class="form-label">País *</label>
+            <input type="text" class="form-control" [(ngModel)]="formulario.paisResidencia" placeholder="Costa Rica">
+          </div>
+        </div>
+        <div class="d-flex justify-content-end mt-3">
+          <button class="btn btn-primary" (click)="siguiente()">Siguiente <i class="bi bi-arrow-right"></i></button>
+        </div>
+      </div>
+
+      PASO 2: Medidas corporales
+      <div *ngIf="paso === 2">
+        <h6 class="text-muted mb-3">Paso 2 — Medidas Corporales</h6>
+        <div class="row g-2">
+          <div class="col-6">
+            <label class="form-label">Peso Actual (kg) *</label>
+            <input type="number" class="form-control" [(ngModel)]="formulario.pesoActual" step="0.1">
+          </div>
+          <div class="col-6">
+            <label class="form-label">IMC *</label>
+            <input type="number" class="form-control" [(ngModel)]="formulario.imc" step="0.1">
+          </div>
+          <div class="col-6">
+            <label class="form-label">Cintura (cm)</label>
+            <input type="number" class="form-control" [(ngModel)]="formulario.cintura" step="0.1">
+          </div>
+          <div class="col-6">
+            <label class="form-label">Cuello (cm)</label>
+            <input type="number" class="form-control" [(ngModel)]="formulario.cuello" step="0.1">
+          </div>
+          <div class="col-6">
+            <label class="form-label">Caderas (cm)</label>
+            <input type="number" class="form-control" [(ngModel)]="formulario.caderas" step="0.1">
+          </div>
+          <div class="col-6">
+            <label class="form-label">% Músculo</label>
+            <input type="number" class="form-control" [(ngModel)]="formulario.porcentajeMusculo" step="0.1">
+          </div>
+          <div class="col-6">
+            <label class="form-label">% Grasa</label>
+            <input type="number" class="form-control" [(ngModel)]="formulario.porcentajeGrasa" step="0.1">
+          </div>
+          <div class="col-6">
+            <label class="form-label">Calorías diarias máx.</label>
+            <input type="number" class="form-control" [(ngModel)]="formulario.consumoMaxCalorias">
+          </div>
+        </div>
+        <div class="d-flex justify-content-between mt-3">
+          <button class="btn btn-outline-secondary" (click)="anterior()">
+            <i class="bi bi-arrow-left"></i> Anterior
+          </button>
+          <button class="btn btn-primary" (click)="siguiente()">Siguiente <i class="bi bi-arrow-right"></i></button>
+        </div>
+      </div>
+
+      PASO 3: Cuenta
+      <div *ngIf="paso === 3">
+        <h6 class="text-muted mb-3">Paso 3 — Cuenta</h6>
+        <div class="mb-3">
+          <label class="form-label">Correo electrónico *</label>
+          <input type="email" class="form-control" [(ngModel)]="formulario.email" placeholder="correo@ejemplo.com">
+        </div>
+        <div class="mb-4">
+          <label class="form-label">Contraseña *</label>
+          <input type="password" class="form-control" [(ngModel)]="formulario.passwordEncriptado" placeholder="••••••••">
+        </div>
+        <div class="d-flex justify-content-between">
+          <button class="btn btn-outline-secondary" (click)="anterior()">
+            <i class="bi bi-arrow-left"></i> Anterior
+          </button>
+          <button class="btn btn-primary" (click)="registrarse()" [disabled]="cargando">
+            <span *ngIf="cargando" class="spinner-border spinner-border-sm me-2"></span>
+            Crear Cuenta
+          </button>
+        </div>
+      </div>
+    </div> -->
+  </div>
+</div>

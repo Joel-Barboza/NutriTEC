@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface RegistroMedidas {
   idRegistro?: number;
@@ -15,7 +16,8 @@ export interface RegistroMedidas {
 
 @Injectable({ providedIn: 'root' })
 export class MedidasService {
-  private apiUrl = 'https://sqlapi20260610230651-hea3g5bkguh0edd7.eastus2-01.azurewebsites.net/api/registromedidas';
+  // private apiUrl = 'https://sqlapi20260610230651-hea3g5bkguh0edd7.eastus2-01.azurewebsites.net/api/registromedidas';
+  private apiUrl = `${environment.sqlApiUrl}/registromedidas`;
 
   constructor(private http: HttpClient) {}
 
