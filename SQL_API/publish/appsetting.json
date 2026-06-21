@@ -1,5 +1,0 @@
-{
-  "ConnectionStrings": {
-    "NutriTecConnection": "Server=tcp:nutritec.database.windows.net,1433;Initial Catalog=NutritecDB;Persist Security Info=False;User ID=nutritecadmin;Password=Nutritec1;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
-  }
-}

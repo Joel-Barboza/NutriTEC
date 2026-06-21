@@ -2,8 +2,10 @@
 .vs
 bin
 obj
-appsettings.Development.json
-appsettings.json
+publish/
+**/appsettings.json
+**/appsettings.Development.json
+**/appsettings.Production.json
 
 
 # Excluir secretos de Azure y Web Deploy
