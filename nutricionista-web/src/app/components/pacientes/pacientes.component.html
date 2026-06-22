@@ -3,7 +3,7 @@
     <h4 class="fw-bold mb-1">
       <i class="bi bi-people-fill me-2 text-success"></i>Pacientes
     </h4>
-    <p class="text-muted mb-0">Busque clientes registrados y asígnelos a su lista de pacientes.</p>
+    <p class="text-muted mb-0">Busque clientes registrados, asócielos y asígneles un plan alimenticio.</p>
   </div>
   <button class="btn btn-outline-primary btn-sm" (click)="cargarPacientesAsociados()" [disabled]="cargandoAsociados">
     <span *ngIf="cargandoAsociados" class="spinner-border spinner-border-sm me-1"></span>
@@ -21,7 +21,6 @@
   <button type="button" class="btn-close" (click)="mensajeError=''" aria-label="Cerrar"></button>
 </div>
 
-<!-- Búsqueda de clientes -->
 <div class="card p-3 mb-4">
   <label class="form-label fw-semibold">Buscar cliente</label>
   <div class="input-group">
@@ -45,7 +44,6 @@
   </small>
 </div>
 
-<!-- Pacientes asociados -->
 <div class="card p-4 mb-4">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h5 class="fw-bold mb-0">Mis pacientes asociados</h5>
@@ -68,27 +66,82 @@
         <tr>
           <th>Paciente</th>
           <th>Correo</th>
-          <th>País</th>
           <th>IMC</th>
           <th>Meta kcal</th>
-          <th>Fecha asociación</th>
+          <th>Plan actual</th>
+          <th>Plan a asignar</th>
+          <th>Fechas</th>
+          <th>Acción</th>
         </tr>
       </thead>
+
       <tbody>
         <tr *ngFor="let paciente of pacientesAsociados">
           <td class="fw-semibold">{{ paciente.nombreCompleto }}</td>
           <td>{{ paciente.pacienteEmail }}</td>
-          <td>{{ paciente.paisResidencia }}</td>
           <td>{{ paciente.imc }}</td>
           <td>{{ paciente.consumoMaxCalorias }}</td>
-          <td>{{ paciente.fechaAsociacion | date:'dd/MM/yyyy' }}</td>
+
+          <td>
+            <span class="badge bg-info text-dark">
+              {{ obtenerNombrePlanAsignado(paciente.pacienteEmail) }}
+            </span>
+          </td>
+
+          <td style="min-width: 230px;">
+            <select
+              class="form-select form-select-sm"
+              [(ngModel)]="planSeleccionadoPorPaciente[paciente.pacienteEmail]"
+            >
+              <option [ngValue]="0">Seleccione un plan</option>
+              <option
+                *ngFor="let plan of planes"
+                [ngValue]="plan.idPlan"
+              >
+                {{ plan.nombrePlan }} - {{ plan.caloriasTotales }} kcal
+              </option>
+            </select>
+          </td>
+
+          <td style="min-width: 260px;">
+            <div class="d-flex gap-2">
+              <input
+                type="date"
+                class="form-control form-control-sm"
+                [(ngModel)]="fechaInicioPorPaciente[paciente.pacienteEmail]"
+              />
+
+              <input
+                type="date"
+                class="form-control form-control-sm"
+                [(ngModel)]="fechaFinPorPaciente[paciente.pacienteEmail]"
+              />
+            </div>
+          </td>
+
+          <td>
+            <button
+              class="btn btn-success btn-sm"
+              (click)="asignarPlan(paciente)"
+              [disabled]="asignandoEmail === paciente.pacienteEmail || planes.length === 0"
+            >
+              <span
+                *ngIf="asignandoEmail === paciente.pacienteEmail"
+                class="spinner-border spinner-border-sm me-1"
+              ></span>
+              Asignar
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
+
+    <div *ngIf="planes.length === 0" class="alert alert-warning mt-3 mb-0">
+      No hay planes disponibles. Primero cree un plan en Gestión de Planes.
+    </div>
   </div>
 </div>
 
-<!-- Resultados de búsqueda -->
 <div class="d-flex justify-content-between align-items-center mb-3" *ngIf="busquedaRealizada">
   <h5 class="fw-bold mb-0">Resultados de búsqueda</h5>
   <span class="text-muted small">{{ resultados.length }} resultado(s)</span>

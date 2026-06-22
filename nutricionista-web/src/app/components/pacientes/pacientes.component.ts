@@ -9,6 +9,9 @@ import {
   PacienteBusqueda
 } from '../../services/nutricionista.service';
 
+import { PlanAlimentacion, PlanService } from '../../services/plan.service';
+import { PlanPaciente, PlanPacienteService } from '../../services/plan-paciente.service';
+
 @Component({
   selector: 'app-pacientes',
   standalone: true,
@@ -21,9 +24,17 @@ export class PacientesComponent implements OnInit {
   resultados: PacienteBusqueda[] = [];
   pacientesAsociados: PacienteAsociado[] = [];
 
+  planes: PlanAlimentacion[] = [];
+  asignaciones: PlanPaciente[] = [];
+
+  planSeleccionadoPorPaciente: { [email: string]: number } = {};
+  fechaInicioPorPaciente: { [email: string]: string } = {};
+  fechaFinPorPaciente: { [email: string]: string } = {};
+
   buscando = false;
   cargandoAsociados = false;
   asociandoEmail = '';
+  asignandoEmail = '';
 
   mensajeExito = '';
   mensajeError = '';
@@ -31,11 +42,15 @@ export class PacientesComponent implements OnInit {
 
   constructor(
     private nutricionistaService: NutricionistaService,
-    private authService: AuthService
+    private authService: AuthService,
+    private planService: PlanService,
+    private planPacienteService: PlanPacienteService
   ) {}
 
   ngOnInit(): void {
     this.cargarPacientesAsociados();
+    this.cargarPlanes();
+    this.cargarAsignaciones();
   }
 
   get codigoNutricionista(): string {
@@ -60,6 +75,32 @@ export class PacientesComponent implements OnInit {
       error: (err) => {
         this.cargandoAsociados = false;
         this.mensajeError = err?.error?.mensaje ?? 'No se pudieron cargar los pacientes asociados.';
+      }
+    });
+  }
+
+  cargarPlanes(): void {
+    if (!this.codigoNutricionista) return;
+
+    this.planService.getPlanesPorNutricionista(this.codigoNutricionista).subscribe({
+      next: (planes) => {
+        this.planes = planes;
+      },
+      error: () => {
+        this.mensajeError = 'No se pudieron cargar los planes del nutricionista.';
+      }
+    });
+  }
+
+  cargarAsignaciones(): void {
+    if (!this.codigoNutricionista) return;
+
+    this.planPacienteService.getAsignaciones(this.codigoNutricionista).subscribe({
+      next: (asignaciones) => {
+        this.asignaciones = asignaciones;
+      },
+      error: () => {
+        this.mensajeError = 'No se pudieron cargar las asignaciones de planes.';
       }
     });
   }
@@ -130,6 +171,72 @@ export class PacientesComponent implements OnInit {
         this.mensajeError = err?.error?.mensaje ?? 'No se pudo asociar el paciente.';
       }
     });
+  }
+
+  asignarPlan(paciente: PacienteAsociado): void {
+    this.mensajeExito = '';
+    this.mensajeError = '';
+
+    const email = paciente.pacienteEmail;
+    const idPlan = this.planSeleccionadoPorPaciente[email];
+    const fechaInicio = this.fechaInicioPorPaciente[email];
+    const fechaFin = this.fechaFinPorPaciente[email];
+
+    if (!idPlan) {
+      this.mensajeError = 'Debe seleccionar un plan.';
+      return;
+    }
+
+    if (!fechaInicio || !fechaFin) {
+      this.mensajeError = 'Debe seleccionar fecha de inicio y fecha fin.';
+      return;
+    }
+
+    if (fechaFin < fechaInicio) {
+      this.mensajeError = 'La fecha fin no puede ser menor que la fecha inicio.';
+      return;
+    }
+
+    const asignacion: PlanPaciente = {
+      pacienteEmail: email,
+      idPlan,
+      nutricionistaCodigo: this.codigoNutricionista,
+      fechaInicio,
+      fechaFin
+    };
+
+    this.asignandoEmail = email;
+
+    this.planPacienteService.asignarPlan(asignacion).subscribe({
+      next: (respuesta) => {
+        this.asignandoEmail = '';
+        this.mensajeExito = respuesta?.mensaje ?? 'Plan asignado correctamente.';
+
+        this.planSeleccionadoPorPaciente[email] = 0;
+        this.fechaInicioPorPaciente[email] = '';
+        this.fechaFinPorPaciente[email] = '';
+
+        this.cargarAsignaciones();
+      },
+      error: (err) => {
+        this.asignandoEmail = '';
+        this.mensajeError = err?.error?.mensaje ?? 'No se pudo asignar el plan.';
+      }
+    });
+  }
+
+  obtenerAsignacionPaciente(email: string): PlanPaciente | undefined {
+    return this.asignaciones.find(a =>
+      a.pacienteEmail.toLowerCase() === email.toLowerCase()
+    );
+  }
+
+  obtenerNombrePlanAsignado(email: string): string {
+    const asignacion = this.obtenerAsignacionPaciente(email);
+
+    if (!asignacion) return 'Sin plan asignado';
+
+    return asignacion.planAlimentacion?.nombrePlan ?? `Plan #${asignacion.idPlan}`;
   }
 
   estaAsociadoConOtroNutricionista(paciente: PacienteBusqueda): boolean {
