@@ -1,0 +1,126 @@
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-4 no-print">
+  <div>
+    <h4 class="fw-bold mb-1">
+      <i class="bi bi-credit-card-2-front me-2 text-success"></i>Reporte de Cobro
+    </h4>
+    <p class="text-muted mb-0">Cobros agrupados por tipo de pago para los nutricionistas registrados.</p>
+  </div>
+
+  <div class="d-flex gap-2">
+    <button class="btn btn-outline-primary btn-sm" type="button" (click)="cargarReporte()">
+      <span *ngIf="cargando" class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+      <i *ngIf="!cargando" class="bi bi-arrow-clockwise me-1"></i>
+      {{ cargando ? 'Reintentar' : 'Actualizar' }}
+    </button>
+
+    <button class="btn btn-outline-secondary btn-sm" type="button" (click)="cancelarCarga()" [disabled]="!cargando">
+      <i class="bi bi-x-circle me-1"></i>Cancelar
+    </button>
+
+    <button class="btn btn-primary btn-sm" type="button" (click)="exportarPdf()" [disabled]="reporte.length === 0">
+      <i class="bi bi-file-earmark-pdf me-1"></i>Exportar PDF
+    </button>
+  </div>
+</div>
+
+<div *ngIf="mensajeError" class="alert alert-danger alert-dismissible no-print">
+  {{ mensajeError }}
+  <button type="button" class="btn-close" (click)="mensajeError=''" aria-label="Cerrar"></button>
+</div>
+
+<div *ngIf="cargando && reporte.length === 0" class="text-center py-5">
+  <div class="spinner-border text-success"></div>
+  <p class="text-muted mt-3 mb-1">{{ mensajeEstado || 'Cargando reporte de cobro...' }}</p>
+  <p class="text-muted small mb-0">Podés tocar <strong>Reintentar</strong> o <strong>Cancelar</strong> aunque siga buscando.</p>
+</div>
+
+<div *ngIf="cargando && reporte.length > 0" class="alert alert-info no-print">
+  Actualizando datos en segundo plano. Podés volver a tocar <strong>Reintentar</strong> si se queda pegado.
+</div>
+
+<div *ngIf="!cargando && reporte.length === 0" class="text-center py-5 text-muted">
+  <i class="bi bi-inbox fs-2"></i>
+  <p class="mt-2 mb-0">No hay datos para mostrar.</p>
+</div>
+
+<div *ngIf="reporte.length > 0" id="reporte-cobro">
+  <div class="row g-3 mb-4 no-print">
+    <div class="col-md-6 col-xl">
+      <div class="card p-3 resumen-card h-100">
+        <span class="text-muted small">Nutricionistas</span>
+        <strong class="fs-4">{{ totalNutricionistas }}</strong>
+      </div>
+    </div>
+    <div class="col-md-6 col-xl">
+      <div class="card p-3 resumen-card h-100">
+        <span class="text-muted small">Pacientes asociados</span>
+        <strong class="fs-4">{{ totalPacientes }}</strong>
+      </div>
+    </div>
+    <div class="col-md-6 col-xl">
+      <div class="card p-3 resumen-card h-100">
+        <span class="text-muted small">Monto total</span>
+        <strong class="fs-4">{{ totalGeneral | currency:'USD':'symbol':'1.2-2' }}</strong>
+      </div>
+    </div>
+    <div class="col-md-6 col-xl">
+      <div class="card p-3 resumen-card h-100">
+        <span class="text-muted small">Descuento</span>
+        <strong class="fs-4">{{ descuentoGeneral | currency:'USD':'symbol':'1.2-2' }}</strong>
+      </div>
+    </div>
+    <div class="col-md-6 col-xl">
+      <div class="card p-3 resumen-card h-100">
+        <span class="text-muted small">Monto a cobrar</span>
+        <strong class="fs-4 text-success">{{ montoCobrarGeneral | currency:'USD':'symbol':'1.2-2' }}</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="card p-3 mb-4 print-header">
+    <h5 class="fw-bold mb-1">Reporte de Cobro NutriTEC</h5>
+    <p class="text-muted mb-0">Agrupado por tipo de pago: semanal, mensual y anual.</p>
+  </div>
+
+  <section *ngFor="let grupo of grupos" class="card p-3 mb-4 reporte-grupo">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+      <h5 class="fw-bold mb-0">Tipo de pago: {{ grupo.tipoCobro }}</h5>
+      <span class="badge bg-success-subtle text-success border border-success-subtle">
+        {{ grupo.registros.length }} nutricionista(s)
+      </span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle table-reporte mb-0">
+        <thead>
+          <tr>
+            <th>Correo electrónico</th>
+            <th>Nombre completo</th>
+            <th>Número de tarjeta</th>
+            <th class="text-end">Pacientes</th>
+            <th class="text-end">Monto total</th>
+            <th class="text-end">Descuento</th>
+            <th class="text-end">Monto a cobrar</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of grupo.registros">
+            <td>{{ item.email }}</td>
+            <td>{{ item.nombreCompleto }}</td>
+            <td>{{ item.numeroTarjeta }}</td>
+            <td class="text-end">{{ item.totalPacientes }}</td>
+            <td class="text-end">{{ item.montoTotal | currency:'USD':'symbol':'1.2-2' }}</td>
+            <td class="text-end">{{ item.descuento | currency:'USD':'symbol':'1.2-2' }}</td>
+            <td class="text-end fw-semibold text-success">{{ item.montoACobrar | currency:'USD':'symbol':'1.2-2' }}</td>
+          </tr>
+          <tr class="subtotal-row">
+            <td colspan="4" class="fw-bold">Subtotal {{ grupo.tipoCobro }}</td>
+            <td class="text-end fw-bold">{{ grupo.montoTotal | currency:'USD':'symbol':'1.2-2' }}</td>
+            <td class="text-end fw-bold">{{ grupo.descuento | currency:'USD':'symbol':'1.2-2' }}</td>
+            <td class="text-end fw-bold text-success">{{ grupo.montoACobrar | currency:'USD':'symbol':'1.2-2' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

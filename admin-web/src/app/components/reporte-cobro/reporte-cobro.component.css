@@ -1,0 +1,38 @@
+.resumen-card {
+  border-left: 4px solid var(--nt-green);
+}
+
+.print-header {
+  background: #ffffff;
+}
+
+.reporte-grupo {
+  overflow: hidden;
+}
+
+.table-reporte th {
+  white-space: nowrap;
+}
+
+.table-reporte td {
+  vertical-align: middle;
+}
+
+.subtotal-row td {
+  background: #f0f7f1;
+}
+
+@media print {
+  .page-content {
+    padding: 0;
+  }
+
+  .card {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+
+  .reporte-grupo {
+    page-break-inside: avoid;
+  }
+}

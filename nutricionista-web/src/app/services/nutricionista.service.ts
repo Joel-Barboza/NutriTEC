@@ -32,7 +32,7 @@ export interface Nutricionista {
 
   // Cobro
   numeroTarjeta: string;
-  tipoCobro: 'SEMANAL' | 'MENSUAL' | 'ANUAL';
+  tipoCobro: 'Semanal' | 'Mensual' | 'Anual' | '';
 }
 
 export interface PacienteBusqueda {

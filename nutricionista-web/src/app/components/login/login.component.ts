@@ -68,7 +68,7 @@ export class LoginComponent implements OnInit {
       direccion: '',
       foto: '',
       numeroTarjeta: '',
-      tipoCobro: 'MENSUAL',
+      tipoCobro: 'Mensual',
       email: '',
       passwordEncriptado: ''
     };
@@ -120,10 +120,29 @@ export class LoginComponent implements OnInit {
     });
   }
 
+  private normalizarTipoCobro(tipoCobro: string): 'Semanal' | 'Mensual' | 'Anual' | '' {
+    const tipo = (tipoCobro ?? '').trim().toUpperCase();
+
+    switch (tipo) {
+      case 'SEMANAL':
+      case 'SEMANALES':
+        return 'Semanal';
+      case 'MENSUAL':
+      case 'MENSUALES':
+        return 'Mensual';
+      case 'ANUAL':
+      case 'ANUALES':
+        return 'Anual';
+      default:
+        return '';
+    }
+  }
+
   registrarse(): void {
     this.error = '';
     this.mensaje = '';
     this.emailYaRegistrado = false;
+    this.formulario.tipoCobro = this.normalizarTipoCobro(this.formulario.tipoCobro);
 
     if (
       !this.formulario.cedula ||

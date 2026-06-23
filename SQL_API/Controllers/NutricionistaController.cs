@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SQL_API.DTOs;
 using SQL_API.Models;
@@ -28,9 +28,41 @@ namespace SQL_API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Nutricionista nuevoNutricionista)
         {
+            if (nuevoNutricionista == null)
+                return BadRequest(new { mensaje = "Debe enviar la información del nutricionista." });
+
+            var tipoCobroNormalizado = NormalizarTipoCobro(nuevoNutricionista.TipoCobro);
+
+            if (tipoCobroNormalizado == null)
+            {
+                return BadRequest(new
+                {
+                    mensaje = "Tipo de cobro inválido. Use Semanal, Mensual o Anual."
+                });
+            }
+
+            nuevoNutricionista.TipoCobro = tipoCobroNormalizado;
+            nuevoNutricionista.CodigoNutricionista = nuevoNutricionista.CodigoNutricionista.Trim();
+            nuevoNutricionista.Email = nuevoNutricionista.Email.Trim();
+            nuevoNutricionista.NumeroTarjeta = nuevoNutricionista.NumeroTarjeta.Trim();
+
             _context.Nutricionistas.Add(nuevoNutricionista);
             await _context.SaveChangesAsync();
-            return Ok(new { mensaje = "Nutricionista registrado con éxito utilizando EF Core." });
+
+            return Ok(nuevoNutricionista);
+        }
+
+        private static string? NormalizarTipoCobro(string? tipoCobro)
+        {
+            var tipo = (tipoCobro ?? string.Empty).Trim().ToUpperInvariant();
+
+            return tipo switch
+            {
+                "SEMANAL" or "SEMANALES" => "Semanal",
+                "MENSUAL" or "MENSUALES" => "Mensual",
+                "ANUAL" or "ANUALES" => "Anual",
+                _ => null
+            };
         }
 
         // =========================================================

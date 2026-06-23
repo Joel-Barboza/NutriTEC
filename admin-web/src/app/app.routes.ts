@@ -1,10 +1,9 @@
 import { Routes } from '@angular/router';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
-// import { FeedBackComponent } from './components/feedback/feedback.component';
 import { LoginComponent } from './components/login/login.component';
 import { authGuard } from './guards/auth.guard';
-// import { ProductosComponent } from './components/productos/productos.component';
 import { PendientesComponent } from './components/pendientes/pendientes.component';
+import { ReporteCobroComponent } from './components/reporte-cobro/reporte-cobro.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -14,9 +13,8 @@ export const routes: Routes = [
     component: DashboardComponent,
     canActivate: [authGuard],
     children: [
-
       { path: 'pendientes', component: PendientesComponent },
-      // { path: 'productos', component: ProductosComponent },
+      { path: 'reporte-cobro', component: ReporteCobroComponent },
       { path: '', redirectTo: 'pendientes', pathMatch: 'full' }
     ]
   },
