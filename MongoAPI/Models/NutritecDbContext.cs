@@ -1,7 +1,8 @@
-﻿using MongoDB.Driver;
 using Microsoft.Extensions.Options;
 using MongoAPI.Configurations;
-using MongoAPI.Models; // Aquí iría tu modelo 'Retroalimentacion' o 'Foro'
+using MongoDB.Bson;
+using MongoDB.Driver;
+using MongoAPI.Models;
 
 namespace MongoAPI.Data
 {
@@ -9,21 +10,27 @@ namespace MongoAPI.Data
     {
         private readonly IMongoDatabase _database;
 
+        public string DatabaseName { get; }
+        public string RetroalimentacionesCollectionName => "Retroalimentaciones";
+
         public NutritecMongoDbContext(IOptions<MongoDbSettings> mongoSettings)
         {
-            // Inicializa el cliente usando el connection string
-            var client = new MongoClient(mongoSettings.Value.ConnectionString);
+            if (string.IsNullOrWhiteSpace(mongoSettings.Value.ConnectionString))
+                throw new InvalidOperationException("MongoDbSettings:ConnectionString no está configurado.");
 
-            // Obtiene la base de datos especificada
-            _database = client.GetDatabase(mongoSettings.Value.DatabaseName);
+            if (string.IsNullOrWhiteSpace(mongoSettings.Value.DatabaseName))
+                throw new InvalidOperationException("MongoDbSettings:DatabaseName no está configurado.");
+
+            DatabaseName = mongoSettings.Value.DatabaseName;
+
+            var client = new MongoClient(mongoSettings.Value.ConnectionString);
+            _database = client.GetDatabase(DatabaseName);
         }
 
-        // En vez de DbSet<T>, MongoDB utiliza IMongoCollection<T>
-        // Aquí defines tu colección para el foro de retroalimentación
         public IMongoCollection<Retroalimentacion> Retroalimentaciones =>
-            _database.GetCollection<Retroalimentacion>("Retroalimentaciones");
+            _database.GetCollection<Retroalimentacion>(RetroalimentacionesCollectionName);
 
-        // Si necesitas agregar más colecciones en el futuro, las declaras igual:
-        // public IMongoCollection<OtroModelo> OtraColeccion => _database.GetCollection<OtroModelo>("NombreEnMongo");
+        public IMongoCollection<BsonDocument> RetroalimentacionesRaw =>
+            _database.GetCollection<BsonDocument>(RetroalimentacionesCollectionName);
     }
 }

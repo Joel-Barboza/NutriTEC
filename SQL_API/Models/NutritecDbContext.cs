@@ -17,10 +17,14 @@ namespace SQL_API.Models
         public DbSet<PacienteNutricionista> PacientesNutricionistas { get; set; }
         public DbSet<PlanAlimentacion> PlanesAlimentacion { get; set; }
         public DbSet<PlanDetalle> PlanDetalles { get; set; }
+        public DbSet<PlanPaciente> PlanesPacientes { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Producto>()
                 .ToTable(tb => tb.HasTrigger("TR_Producto_Aprobacion"));
+
+            modelBuilder.Entity<ConsumoDiario>()
+                .ToTable(tb => tb.HasTrigger("TR_ConsumoDiario_FechaDefault"));
 
             modelBuilder.Entity<RecetaDetalle>()
                 .HasOne(rd => rd.Receta)
@@ -55,8 +59,24 @@ namespace SQL_API.Models
                 .HasForeignKey(pd => pd.ProductoCodigo);
             // Tabla de asociación entre paciente y nutricionista.
             // En la BD actual PacienteEmail es PRIMARY KEY, por eso se configura así.
+            
             modelBuilder.Entity<PacienteNutricionista>()
                 .HasKey(pn => pn.PacienteEmail);
+
+            modelBuilder.Entity<PlanPaciente>()
+                .HasOne(pp => pp.Paciente)
+                .WithMany()
+                .HasForeignKey(pp => pp.PacienteEmail);
+
+            modelBuilder.Entity<PlanPaciente>()
+                .HasOne(pp => pp.PlanAlimentacion)
+                .WithMany()
+                .HasForeignKey(pp => pp.IdPlan);
+
+            modelBuilder.Entity<PlanPaciente>()
+                .HasOne(pp => pp.Nutricionista)
+                .WithMany()
+                .HasForeignKey(pp => pp.NutricionistaCodigo);
         }
     }
 }

@@ -1,0 +1,70 @@
+<h4 class="fw-bold mb-3">
+  <i class="bi bi-calendar-check me-2 text-success"></i>Asignar Plan
+</h4>
+
+<div *ngIf="mensajeExito" class="alert alert-success">{{ mensajeExito }}</div>
+<div *ngIf="mensajeError" class="alert alert-danger">{{ mensajeError }}</div>
+
+<div class="card p-4 mb-4">
+  <h5 class="fw-bold mb-3">Nueva asignación</h5>
+
+  <div class="row g-3">
+    <div class="col-md-4">
+      <label class="form-label">Paciente asociado</label>
+      <select class="form-select" [(ngModel)]="pacienteSeleccionado">
+        <option value="">Seleccione un paciente</option>
+        <option *ngFor="let paciente of pacientesAsociados" [value]="paciente.pacienteEmail">
+          {{ paciente.nombreCompleto }} - {{ paciente.pacienteEmail }}
+        </option>
+      </select>
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">Plan alimenticio</label>
+      <select class="form-select" [(ngModel)]="idPlanSeleccionado">
+        <option [ngValue]="0">Seleccione un plan</option>
+        <option *ngFor="let plan of planes" [ngValue]="plan.idPlan">
+          {{ plan.nombrePlan }} - {{ plan.caloriasTotales }} kcal
+        </option>
+      </select>
+    </div>
+
+    <div class="col-md-2">
+      <label class="form-label">Inicio</label>
+      <input type="date" class="form-control" [(ngModel)]="fechaInicio">
+    </div>
+
+    <div class="col-md-2">
+      <label class="form-label">Fin</label>
+      <input type="date" class="form-control" [(ngModel)]="fechaFin">
+    </div>
+  </div>
+
+  <button class="btn btn-success mt-3" (click)="asignarPlan()" [disabled]="guardando">
+    <span *ngIf="guardando" class="spinner-border spinner-border-sm me-1"></span>
+    Asignar plan
+  </button>
+</div>
+
+<div class="card p-4">
+  <h5 class="fw-bold mb-3">Planes asignados</h5>
+
+  <div *ngIf="asignaciones.length === 0" class="text-muted">
+    No hay planes asignados todavía.
+  </div>
+
+  <div class="row g-3" *ngIf="asignaciones.length > 0">
+    <div class="col-md-6 col-xl-4" *ngFor="let asignacion of asignaciones">
+      <div class="card asignacion-card p-3 h-100">
+        <h6 class="fw-bold">{{ obtenerNombrePaciente(asignacion.pacienteEmail) }}</h6>
+        <p class="mb-1"><strong>Plan:</strong> {{ asignacion.planAlimentacion?.nombrePlan || asignacion.idPlan }}</p>
+        <p class="mb-1"><strong>Inicio:</strong> {{ asignacion.fechaInicio | date:'dd/MM/yyyy' }}</p>
+        <p class="mb-3"><strong>Fin:</strong> {{ asignacion.fechaFin | date:'dd/MM/yyyy' }}</p>
+
+        <button class="btn btn-outline-danger btn-sm" (click)="eliminarAsignacion(asignacion.idAsignacion)">
+          Eliminar asignación
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

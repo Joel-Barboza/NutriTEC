@@ -25,7 +25,6 @@ export interface Paciente {
 @Injectable({ providedIn: 'root' })
 export class PacienteService {
   private apiUrl = `${environment.sqlApiUrl}/paciente`;
-  // private apiUrl = 'https://sqlapi20260610230651-hea3g5bkguh0edd7.eastus2-01.azurewebsites.net/api/paciente';
 
   constructor(private http: HttpClient) {}
 
@@ -37,8 +36,15 @@ export class PacienteService {
     return this.http.get<Paciente>(`${this.apiUrl}/${encodeURIComponent(email)}`);
   }
 
-  crearPaciente(paciente: Paciente): Observable<any> {
-    return this.http.post(this.apiUrl, paciente);
+  login(email: string, password: string): Observable<Paciente> {
+    return this.http.post<Paciente>(`${this.apiUrl}/login`, {
+      email,
+      password
+    });
+  }
+
+  crearPaciente(paciente: Paciente): Observable<Paciente> {
+    return this.http.post<Paciente>(this.apiUrl, paciente);
   }
 
   actualizarPaciente(email: string, paciente: Partial<Paciente>): Observable<any> {

@@ -1,43 +1,68 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
-  <h4 class="fw-bold mb-0"><i class="bi bi-upc-scan me-2 text-success"></i>Productos</h4>
+  <h4 class="fw-bold mb-0">
+    <i class="bi bi-upc-scan me-2 text-success"></i>Productos
+  </h4>
+
   <button class="btn btn-primary btn-sm" (click)="toggleFormulario()">
     <i class="bi" [class.bi-plus-lg]="!mostrarFormulario" [class.bi-x-lg]="mostrarFormulario"></i>
     {{ mostrarFormulario ? 'Cancelar' : 'Nuevo Producto' }}
   </button>
 </div>
 
-<!-- Mensajes -->
 <div *ngIf="mensajeExito" class="alert alert-success alert-dismissible">
   {{ mensajeExito }}
   <button type="button" class="btn-close" (click)="mensajeExito=''"></button>
 </div>
+
 <div *ngIf="mensajeError" class="alert alert-danger alert-dismissible">
   {{ mensajeError }}
   <button type="button" class="btn-close" (click)="mensajeError=''"></button>
 </div>
 
-<!-- Formulario nuevo producto -->
 <div *ngIf="mostrarFormulario" class="card mb-4 p-4">
-  <h6 class="fw-semibold mb-3">Agregar Nuevo Producto</h6>
-  <p class="text-muted small mb-3">
+  <h6 class="fw-semibold mb-3">
+    {{ editando ? 'Editar Producto' : 'Agregar Nuevo Producto' }}
+  </h6>
+
+  <p class="text-muted small mb-3" *ngIf="!editando">
     <i class="bi bi-info-circle me-1"></i>
     El producto quedará pendiente de aprobación por el administrador antes de ser visible para todos.
+  </p>
+
+  <p class="text-muted small mb-3" *ngIf="editando">
+    <i class="bi bi-pencil-square me-1"></i>
+    Está editando un producto existente.
   </p>
 
   <div class="row g-3">
     <div class="col-md-4">
       <label class="form-label">Código de barras *</label>
-      <input type="text" class="form-control" [(ngModel)]="nuevoProducto.codigoBarras" placeholder="7441001000000">
+      <input
+        type="text"
+        class="form-control"
+        [(ngModel)]="nuevoProducto.codigoBarras"
+        [readonly]="editando"
+        placeholder="7441001000000">
     </div>
+
     <div class="col-md-8">
       <label class="form-label">Descripción *</label>
-      <input type="text" class="form-control" [(ngModel)]="nuevoProducto.descripcion"
+      <input
+        type="text"
+        class="form-control"
+        [(ngModel)]="nuevoProducto.descripcion"
         placeholder="Ej: Arroz Blanco Cocido">
     </div>
+
     <div class="col-md-3">
       <label class="form-label">Porción</label>
-      <input type="number" class="form-control" [(ngModel)]="nuevoProducto.tamanoPorcion" step="0.1">
+      <input
+        type="number"
+        class="form-control"
+        [(ngModel)]="nuevoProducto.tamanoPorcion"
+        step="0.1">
     </div>
+
     <div class="col-md-3">
       <label class="form-label">Unidad *</label>
       <select class="form-select" [(ngModel)]="nuevoProducto.unidadMedida">
@@ -45,64 +70,119 @@
         <option value="ml">ml (mililitros)</option>
       </select>
     </div>
+
     <div class="col-md-3">
       <label class="form-label">Energía (Kcal)</label>
-      <input type="number" class="form-control" [(ngModel)]="nuevoProducto.energiaKcal">
+      <input
+        type="number"
+        class="form-control"
+        [(ngModel)]="nuevoProducto.energiaKcal">
     </div>
+
     <div class="col-md-3">
       <label class="form-label">Grasa (g)</label>
-      <input type="number" class="form-control" [(ngModel)]="nuevoProducto.grasaG" step="0.01">
+      <input
+        type="number"
+        class="form-control"
+        [(ngModel)]="nuevoProducto.grasaG"
+        step="0.01">
     </div>
+
     <div class="col-md-3">
       <label class="form-label">Sodio (mg)</label>
-      <input type="number" class="form-control" [(ngModel)]="nuevoProducto.sodioMg" step="0.01">
+      <input
+        type="number"
+        class="form-control"
+        [(ngModel)]="nuevoProducto.sodioMg"
+        step="0.01">
     </div>
+
     <div class="col-md-3">
       <label class="form-label">Carbohidratos (g)</label>
-      <input type="number" class="form-control" [(ngModel)]="nuevoProducto.carbohidratosG" step="0.01">
+      <input
+        type="number"
+        class="form-control"
+        [(ngModel)]="nuevoProducto.carbohidratosG"
+        step="0.01">
     </div>
+
     <div class="col-md-3">
       <label class="form-label">Proteína (g)</label>
-      <input type="number" class="form-control" [(ngModel)]="nuevoProducto.proteinaG" step="0.01">
+      <input
+        type="number"
+        class="form-control"
+        [(ngModel)]="nuevoProducto.proteinaG"
+        step="0.01">
     </div>
+
     <div class="col-md-3">
       <label class="form-label">Calcio (mg)</label>
-      <input type="number" class="form-control" [(ngModel)]="nuevoProducto.calcioMg" step="0.01">
+      <input
+        type="number"
+        class="form-control"
+        [(ngModel)]="nuevoProducto.calcioMg"
+        step="0.01">
     </div>
+
     <div class="col-md-3">
       <label class="form-label">Hierro (mg)</label>
-      <input type="number" class="form-control" [(ngModel)]="nuevoProducto.hierroMg" step="0.01">
+      <input
+        type="number"
+        class="form-control"
+        [(ngModel)]="nuevoProducto.hierroMg"
+        step="0.01">
     </div>
+
     <div class="col-md-9">
       <label class="form-label">Vitaminas</label>
-      <input type="text" class="form-control" [(ngModel)]="nuevoProducto.vitaminas" placeholder="Ej: Vitamina A, B6, C">
+      <input
+        type="text"
+        class="form-control"
+        [(ngModel)]="nuevoProducto.vitaminas"
+        placeholder="Ej: Vitamina A, B6, C">
     </div>
   </div>
 
   <div class="d-flex justify-content-end mt-4">
-    <button class="btn btn-outline-secondary me-2" (click)="toggleFormulario()">Cancelar</button>
-    <button class="btn btn-primary" (click)="crearProducto()" [disabled]="guardando">
+    <button
+      class="btn btn-outline-secondary me-2"
+      (click)="cancelarEdicion(); mostrarFormulario=false">
+      Cancelar
+    </button>
+
+    <button
+      class="btn"
+      [class.btn-warning]="editando"
+      [class.btn-primary]="!editando"
+      (click)="guardarProducto()"
+      [disabled]="guardando">
+
       <span *ngIf="guardando" class="spinner-border spinner-border-sm me-1"></span>
-      Enviar para Aprobación
+
+      {{ editando ? 'Guardar Cambios' : 'Enviar para Aprobación' }}
     </button>
   </div>
 </div>
 
-<!-- Búsqueda -->
 <div class="card p-3 mb-4">
   <div class="input-group">
-    <input type="text" class="form-control" placeholder="Buscar por nombre o código de barras..."
-      [(ngModel)]="terminoBusqueda" (keyup.enter)="buscar()">
+    <input
+      type="text"
+      class="form-control"
+      placeholder="Buscar por nombre o código de barras..."
+      [(ngModel)]="terminoBusqueda"
+      (keyup.enter)="buscar()">
+
     <button class="btn btn-primary" (click)="buscar()">
       <i class="bi bi-search"></i> Buscar
     </button>
+
     <button class="btn btn-outline-secondary" (click)="terminoBusqueda=''; cargarAprobados()">
       <i class="bi bi-x"></i>
     </button>
   </div>
 </div>
 
-<!-- Lista de productos -->
 <div *ngIf="buscando" class="text-center py-4">
   <div class="spinner-border text-success"></div>
 </div>
@@ -119,30 +199,52 @@
         <div class="fw-semibold">{{ p.descripcion }}</div>
         <span class="badge bg-secondary small">{{ p.codigoBarras }}</span>
       </div>
+
       <div class="text-muted small mb-2">
         {{ p.tamanoPorcion }}{{ p.unidadMedida }} por porción
       </div>
+
       <div class="row g-1 small">
         <div class="col-6">
           <span class="text-muted">Energía:</span>
           <strong class="ms-1">{{ p.energiaKcal }} kcal</strong>
         </div>
+
         <div class="col-6">
           <span class="text-muted">Proteína:</span>
           <strong class="ms-1">{{ p.proteinaG }}g</strong>
         </div>
+
         <div class="col-6">
           <span class="text-muted">Carbohidratos:</span>
           <strong class="ms-1">{{ p.carbohidratosG }}g</strong>
         </div>
+
         <div class="col-6">
           <span class="text-muted">Grasa:</span>
           <strong class="ms-1">{{ p.grasaG }}g</strong>
         </div>
+
         <div class="col-12" *ngIf="p.vitaminas">
           <span class="text-muted">Vitaminas:</span>
           <span class="ms-1">{{ p.vitaminas }}</span>
         </div>
+      </div>
+
+      <div class="d-flex justify-content-end gap-2 mt-3">
+        <button
+          class="btn btn-outline-warning btn-sm"
+          (click)="editarProducto(p)">
+          <i class="bi bi-pencil"></i>
+          Editar
+        </button>
+
+        <button
+          class="btn btn-outline-danger btn-sm"
+          (click)="eliminarProducto(p)">
+          <i class="bi bi-trash"></i>
+          Eliminar
+        </button>
       </div>
     </div>
   </div>

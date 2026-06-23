@@ -37,5 +37,14 @@ export class ProductoService {
 
   crear(producto: Producto): Observable<any> {
     return this.http.post(this.apiUrl, producto);
+    
   }
+  actualizar(codigo: string, producto: Producto): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${encodeURIComponent(codigo)}`, producto);
+  }
+
+  eliminar(codigo: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${encodeURIComponent(codigo)}`);
+  }
+  
 }

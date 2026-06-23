@@ -32,7 +32,7 @@ export interface Nutricionista {
 
   // Cobro
   numeroTarjeta: string;
-  tipoCobro: 'SEMANAL' | 'MENSUAL' | 'ANUAL';
+  tipoCobro: 'Semanal' | 'Mensual' | 'Anual' | '';
 }
 
 export interface PacienteBusqueda {
@@ -76,19 +76,20 @@ export interface AsociacionPacienteResponse {
 })
 export class NutricionistaService {
 
-  // API original de nutricionistas.
-  // private apiUrl = 'http://localhost:5274/api/nutricionista';
   private apiUrl = `${environment.sqlApiUrl}/nutricionista`;
-
-  // API nueva y separada para la asociación paciente-nutricionista.
-  // private apiPacienteNutricionistaUrl = 'http://localhost:5274/api/paciente-nutricionista';
-  
   private apiPacienteNutricionistaUrl = `${environment.sqlApiUrl}/paciente-nutricionista`;
 
   constructor(private http: HttpClient) {}
 
   getUsuarios(): Observable<Nutricionista[]> {
     return this.http.get<Nutricionista[]>(this.apiUrl);
+  }
+
+  login(email: string, password: string): Observable<Nutricionista> {
+    return this.http.post<Nutricionista>(`${this.apiUrl}/login`, {
+      email,
+      password
+    });
   }
 
   crearUsuario(nutricionista: Nutricionista): Observable<Nutricionista> {

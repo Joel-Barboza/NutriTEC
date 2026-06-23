@@ -1,0 +1,81 @@
+<div class="feedback-page">
+  <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
+    <div>
+      <h4 class="fw-bold mb-1">
+        <i class="bi bi-chat-dots-fill me-2 text-success"></i>Retroalimentación
+      </h4>
+      <p class="text-muted mb-0">Revise los comentarios de su nutricionista y responda en el hilo de seguimiento.</p>
+      <small class="text-muted" *ngIf="pacienteEmail">Paciente: {{ pacienteEmail }}</small>
+    </div>
+
+    <button class="btn btn-outline-primary btn-sm" type="button" (click)="cargarHilos()">
+      <span *ngIf="cargando" class="spinner-border spinner-border-sm me-1"></span>
+      Refrescar
+    </button>
+  </div>
+
+  <div *ngIf="mensajeExito" class="alert alert-success alert-dismissible">
+    {{ mensajeExito }}
+    <button type="button" class="btn-close" (click)="mensajeExito=''" aria-label="Cerrar"></button>
+  </div>
+
+  <div *ngIf="mensajeError" class="alert alert-danger alert-dismissible">
+    {{ mensajeError }}
+    <button type="button" class="btn-close" (click)="mensajeError=''" aria-label="Cerrar"></button>
+  </div>
+
+  <div *ngIf="cargando" class="text-center py-5">
+    <div class="spinner-border text-success"></div>
+    <p class="text-muted mt-2 mb-0">Cargando retroalimentación desde MongoDB...</p>
+  </div>
+
+  <div *ngIf="!cargando && hilos.length === 0 && !mensajeError" class="card p-5 empty-state">
+    <i class="bi bi-chat-square-text fs-2"></i>
+    <p class="mb-0 mt-2">Aún no hay retroalimentación registrada por su nutricionista.</p>
+  </div>
+
+  <div class="hilo-card" *ngFor="let hilo of hilos; trackBy: trackByHiloId">
+    <div class="d-flex justify-content-between align-items-start gap-2 mb-2 flex-wrap">
+      <div>
+        <div class="fw-bold fs-5">{{ hilo.tituloHilo }}</div>
+        <small class="text-muted">
+          Nutricionista: {{ hilo.nutricionistaId }} · Creado: {{ hilo.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}
+          <span *ngIf="hilo.fechaConsumo"> · Día revisado: {{ hilo.fechaConsumo | date:'dd/MM/yyyy' }}</span>
+        </small>
+      </div>
+    </div>
+
+    <div class="conversacion-container">
+      <div
+        class="mensaje-burbuja"
+        *ngFor="let mensaje of hilo.conversacion"
+        [ngClass]="mensaje.autor === 'Paciente' ? 'mensaje-paciente' : 'mensaje-nutricionista'">
+        <div class="mensaje-header">
+          <strong>{{ mensaje.autor }}</strong>
+          <small>{{ mensaje.fecha | date:'dd/MM/yyyy HH:mm' }}</small>
+        </div>
+        <p>{{ mensaje.mensaje }}</p>
+      </div>
+    </div>
+
+    <div class="respuesta-box mt-3">
+      <label class="form-label fw-semibold">Responder al nutricionista</label>
+      <textarea
+        class="form-control"
+        rows="3"
+        [(ngModel)]="respuestasPorHilo[obtenerIdHilo(hilo)]"
+        placeholder="Escriba su respuesta aquí..."></textarea>
+
+      <div class="d-flex justify-content-end mt-2">
+        <button
+          class="btn btn-success btn-sm"
+          type="button"
+          (click)="responderHilo(hilo)"
+          [disabled]="respondiendoId === obtenerIdHilo(hilo) || !respuestasPorHilo[obtenerIdHilo(hilo)]?.trim()">
+          <span *ngIf="respondiendoId === obtenerIdHilo(hilo)" class="spinner-border spinner-border-sm me-1"></span>
+          Enviar respuesta
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

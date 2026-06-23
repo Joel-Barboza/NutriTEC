@@ -107,6 +107,32 @@ namespace SQL_API.Controllers
             return Ok(new { mensaje = "Producto aprobado exitosamente." });
         }
 
+        // PUT: api/producto/{codigo}
+        [HttpPut("{codigo}")]
+        public async Task<IActionResult> Update(string codigo, [FromBody] Producto productoActualizado)
+        {
+            var producto = await _context.Productos
+                .FirstOrDefaultAsync(p => p.CodigoBarras == codigo);
+
+            if (producto == null)
+                return NotFound(new { mensaje = "Producto no encontrado." });
+
+                producto.Descripcion = productoActualizado.Descripcion;
+                producto.TamanoPorcion = productoActualizado.TamanoPorcion;
+                producto.UnidadMedida = productoActualizado.UnidadMedida;
+                producto.EnergiaKcal = productoActualizado.EnergiaKcal;
+                producto.GrasaG = productoActualizado.GrasaG;
+                producto.SodioMg = productoActualizado.SodioMg;
+                producto.CarbohidratosG = productoActualizado.CarbohidratosG;
+                producto.ProteinaG = productoActualizado.ProteinaG;
+                producto.Vitaminas = productoActualizado.Vitaminas;
+                producto.CalcioMg = productoActualizado.CalcioMg;
+                producto.HierroMg = productoActualizado.HierroMg;
+
+            await _context.SaveChangesAsync();
+            return Ok(new { mensaje = "Producto actualizado correctamente." });
+        }
+
         // DELETE: api/producto/{codigo}
         [HttpDelete("{codigo}")]
         public async Task<IActionResult> Delete(string codigo)
@@ -117,10 +143,10 @@ namespace SQL_API.Controllers
             if (producto == null)
                 return NotFound(new { mensaje = "Producto no encontrado." });
 
-            _context.Productos.Remove(producto);
+            producto.AprobadoPorAdministrador = false;
             await _context.SaveChangesAsync();
 
-            return Ok(new { mensaje = "Producto eliminado." });
+            return Ok(new { mensaje = "Producto eliminado correctamente." });
         }
     }
 }

@@ -1,207 +1,97 @@
-.reservas-page {
-  padding: 20px 30px;
-  font-family: Arial, sans-serif;
-  min-height: 300px;
+.seguimiento-page {
+  padding: 1rem;
 }
 
-/* Estado inicial / cargando */
-.estado-inicial {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 300px;
-  gap: 16px;
-  color: #6b7280;
-  font-size: 0.9rem;
-}
-
-.estado-inicial p {
-  margin: 0;
-}
-
-.texto-cargando {
-  color: #3b82f6;
-  font-weight: bold;
-}
-
-.btn-cargar {
-  padding: 12px 32px;
-  background-color: #3b82f6;
-  color: #fff;
+.card {
   border: none;
-  border-radius: 5px;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
+  border-radius: 1rem;
+  box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.08);
 }
 
-.btn-cargar:hover {
-  background-color: #2563eb;
+.seguimiento-card-left {
+  min-height: 520px;
 }
 
-.btn-cargar-sm {
-  padding: 8px 20px;
-  font-size: 0.875rem;
-  margin-top: 8px;
-}
-
-/* Toolbar */
-.toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-}
-
-.btn-recargar {
-  padding: 6px 14px;
-  background-color: #6b7280;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 14px;
-  white-space: nowrap;
-}
-
-.btn-recargar:hover {
-  background-color: #4b5563;
-}
-
-.msg-success {
-  flex: 1;
-  color: #10b981;
-  padding: 6px 12px;
-  background-color: #ecfdf5;
-  border-radius: 5px;
-  border: 1px solid #d1fae5;
-  font-size: 0.875rem;
-  margin: 0;
-}
-
-.msg-error {
-  flex: 1;
-  color: #ef4444;
-  padding: 6px 12px;
-  background-color: #fef2f2;
-  border-radius: 5px;
-  border: 1px solid #fecaca;
-  font-size: 0.875rem;
-  margin: 0;
-}
-
-.placeholder {
-  min-height: 250px;
-  border: 2px dashed #3b82f6;
-  border-radius: 10px;
-  background-color: #ffffff;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+.empty-state {
+  color: #6c757d;
   text-align: center;
-  gap: 6px;
-  padding: 20px;
+  border: 1px dashed #ced4da;
+  border-radius: 0.75rem;
+  background: #f8f9fa;
 }
 
-.placeholder p {
-  margin: 0;
-  font-size: 0.9rem;
-  color: #6b7280;
+.seguimiento-textarea {
+  min-height: 150px;
+  resize: vertical;
 }
 
-.placeholder-hint {
-  font-size: 0.825rem !important;
+.plan-card {
+  border: 1px solid #dbeafe;
+  border-radius: 0.9rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: #f8fbff;
 }
 
-/* Cards */
-.reservas-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.tiempo-card {
+  border: 1px solid #e9ecef;
+  border-radius: 0.75rem;
+  padding: 0.9rem;
+  margin-bottom: 0.8rem;
+  background: #fff;
 }
 
-.reserva-card {
-  background-color: #ffffff;
-  border: 1px solid #d1d5db;
-  border-radius: 10px;
-  padding: 16px 20px;
-  box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
-}
-
-.reserva-top {
+.consumo-item {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
+  gap: 1rem;
+  border-top: 1px solid #f1f3f5;
+  padding: 0.55rem 0;
 }
 
-.reserva-ruta {
-  font-weight: bold;
-  font-size: 1rem;
-  color: #1f2937;
+.consumo-item:first-of-type {
+  border-top: none;
 }
 
-.estado-badge {
-  font-size: 0.78rem;
-  font-weight: bold;
-  padding: 3px 10px;
-  border-radius: 5px;
-  background-color: #f3f4f6;
-  color: #6b7280;
-  border: 1px solid #d1d5db;
+.hilo-card {
+  border: 1px solid #e9ecef;
+  border-radius: 0.9rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: #ffffff;
 }
 
-.estado-badge.pagado {
-  background-color: #ecfdf5;
-  color: #10b981;
-  border-color: #d1fae5;
-}
-
-.reserva-details {
-  display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
-  margin-bottom: 14px;
-}
-
-.detail-item {
+.conversacion-container {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0.75rem;
 }
 
-.detail-label {
-  font-size: 0.72rem;
-  font-weight: bold;
-  color: #9ca3af;
-  text-transform: uppercase;
+.mensaje-burbuja {
+  border-radius: 0.9rem;
+  padding: 0.75rem 0.9rem;
+  max-width: 95%;
+  white-space: pre-wrap;
 }
 
-.detail-value {
-  font-size: 0.875rem;
-  color: #1f2937;
+.mensaje-nutricionista {
+  background: #eaf7ee;
+  align-self: flex-start;
 }
 
-.reserva-actions {
-  border-top: 1px solid #f3f4f6;
-  padding-top: 12px;
+.mensaje-paciente {
+  background: #eef4ff;
+  align-self: flex-end;
 }
 
-.btn-cancel {
-  padding: 6px 14px;
-  background-color: #fef2f2;
-  color: #ef4444;
-  border: 1px solid #fecaca;
-  border-radius: 5px;
-  font-size: 0.875rem;
-  font-weight: bold;
-  cursor: pointer;
+.mensaje-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.85rem;
+  margin-bottom: 0.35rem;
 }
 
-.btn-cancel:hover {
-  background-color: #fee2e2;
+.mensaje-burbuja p {
+  margin-bottom: 0;
 }

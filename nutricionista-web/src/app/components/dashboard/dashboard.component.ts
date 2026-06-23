@@ -17,6 +17,7 @@ export class DashboardComponent {
     { nombre: 'Productos', valor: 'productos' },
     { nombre: 'Pacientes', valor: 'pacientes' },
     { nombre: 'Gestión de Planes', valor: 'planes' },
+    { nombre: 'Asignar Plan', valor: 'asignar-plan' },
     { nombre: 'Retroalimentación', valor: 'feedback' },
   ];
 

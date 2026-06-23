@@ -9,6 +9,9 @@ import {
   PacienteBusqueda
 } from '../../services/nutricionista.service';
 
+import { PlanAlimentacion, PlanService } from '../../services/plan.service';
+import { PlanPaciente, PlanPacienteService } from '../../services/plan-paciente.service';
+
 @Component({
   selector: 'app-pacientes',
   standalone: true,
@@ -21,9 +24,17 @@ export class PacientesComponent implements OnInit {
   resultados: PacienteBusqueda[] = [];
   pacientesAsociados: PacienteAsociado[] = [];
 
+  planes: PlanAlimentacion[] = [];
+  asignaciones: PlanPaciente[] = [];
+
+  planSeleccionadoPorPaciente: { [email: string]: number } = {};
+  fechaInicioPorPaciente: { [email: string]: string } = {};
+  fechaFinPorPaciente: { [email: string]: string } = {};
+
   buscando = false;
   cargandoAsociados = false;
   asociandoEmail = '';
+  asignandoEmail = '';
 
   mensajeExito = '';
   mensajeError = '';
@@ -31,11 +42,15 @@ export class PacientesComponent implements OnInit {
 
   constructor(
     private nutricionistaService: NutricionistaService,
-    private authService: AuthService
+    private authService: AuthService,
+    private planService: PlanService,
+    private planPacienteService: PlanPacienteService
   ) {}
 
   ngOnInit(): void {
     this.cargarPacientesAsociados();
+    this.cargarPlanes();
+    this.cargarAsignaciones();
   }
 
   get codigoNutricionista(): string {
@@ -60,6 +75,32 @@ export class PacientesComponent implements OnInit {
       error: (err) => {
         this.cargandoAsociados = false;
         this.mensajeError = err?.error?.mensaje ?? 'No se pudieron cargar los pacientes asociados.';
+      }
+    });
+  }
+
+  cargarPlanes(): void {
+    if (!this.codigoNutricionista) return;
+
+    this.planService.getPlanesPorNutricionista(this.codigoNutricionista).subscribe({
+      next: (planes) => {
+        this.planes = planes;
+      },
+      error: () => {
+        this.mensajeError = 'No se pudieron cargar los planes del nutricionista.';
+      }
+    });
+  }
+
+  cargarAsignaciones(): void {
+    if (!this.codigoNutricionista) return;
+
+    this.planPacienteService.getAsignaciones(this.codigoNutricionista).subscribe({
+      next: (asignaciones) => {
+        this.asignaciones = asignaciones;
+      },
+      error: () => {
+        this.mensajeError = 'No se pudieron cargar las asignaciones de planes.';
       }
     });
   }
@@ -131,9 +172,8 @@ export class PacientesComponent implements OnInit {
       }
     });
   }
-
-  estaAsociadoConOtroNutricionista(paciente: PacienteBusqueda): boolean {
-    return !!paciente.nutricionistaActualCodigo &&
+    estaAsociadoConOtroNutricionista(paciente: PacienteBusqueda): boolean {
+      return !!paciente.nutricionistaActualCodigo &&
       paciente.nutricionistaActualCodigo.toLowerCase() !== this.codigoNutricionista.toLowerCase();
-  }
+      }
 }

@@ -20,3 +20,32 @@ thead th {
   text-transform: uppercase;
   letter-spacing: 0.02rem;
 }
+
+.paciente-asignacion-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #ffffff;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.paciente-asignacion-card:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.avatar-paciente {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #d1e7dd;
+  color: #0f5132;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.empty-state {
+  color: #6c757d;
+  text-align: center;
+}

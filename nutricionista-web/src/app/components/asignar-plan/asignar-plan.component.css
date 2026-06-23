@@ -1,0 +1,8 @@
+.asignacion-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+}
+
+.asignacion-card:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
