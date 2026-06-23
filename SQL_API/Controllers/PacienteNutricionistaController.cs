@@ -145,6 +145,36 @@ namespace SQL_API.Controllers
             return Ok(resultado);
         }
 
+        // GET: api/paciente-nutricionista/por-paciente/joel@gmail.com
+        [HttpGet("por-paciente/{email}")]
+        public async Task<IActionResult> GetNutricionistaDePaciente(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return BadRequest(new { mensaje = "El correo del paciente es requerido." });
+
+            var emailNormalizado = email.Trim().ToLower();
+
+            var asociacion = await (
+                from a in _context.PacientesNutricionistas.AsNoTracking()
+                join n in _context.Nutricionistas.AsNoTracking()
+                    on a.NutricionistaCodigo equals n.CodigoNutricionista
+                where a.PacienteEmail.ToLower() == emailNormalizado
+                select new
+                {
+                    a.PacienteEmail,
+                    a.NutricionistaCodigo,
+                    a.FechaAsociacion,
+                    NombreNutricionista = n.Nombre + " " + n.Apellido1 + " " + n.Apellido2,
+                    EmailNutricionista = n.Email
+                }
+            ).FirstOrDefaultAsync();
+
+            if (asociacion == null)
+                return NotFound(new { mensaje = "El paciente no tiene nutricionista asignado." });
+
+            return Ok(asociacion);
+        }
+
         // POST: api/paciente-nutricionista/asociar
         // Body JSON:
         // {
