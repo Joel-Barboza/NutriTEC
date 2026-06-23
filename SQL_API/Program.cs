@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SQL_API.DTOs;
 using SQL_API.Models;
+using SQL_API.Security;
 using System.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,6 +32,8 @@ var app = builder.Build();
 app.UseCors("AllowAngular");
 
 app.UseAuthorization();
+
+await PasswordMigration.HashLegacyPasswordsAsync(app.Services);
 
 app.MapControllers();
 

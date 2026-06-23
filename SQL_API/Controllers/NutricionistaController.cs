@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SQL_API.DTOs;
 using SQL_API.Models;
+using SQL_API.Security;
 
 namespace SQL_API.Controllers
 {
@@ -20,8 +21,31 @@ namespace SQL_API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var nutricionistas = await _context.Nutricionistas.ToListAsync();
-            return Ok(nutricionistas);
+            var nutricionistas = await _context.Nutricionistas.AsNoTracking().ToListAsync();
+            return Ok(nutricionistas.Select(ToNutricionistaSeguro));
+        }
+
+        // POST: api/nutricionista/login
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
+        {
+            if (request == null || string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
+                return BadRequest(new { mensaje = "Debe enviar correo y contraseña." });
+
+            var emailNormalizado = request.Email.Trim().ToLower();
+
+            var nutricionista = await _context.Nutricionistas
+                .FirstOrDefaultAsync(n => n.Email.ToLower() == emailNormalizado);
+
+            if (nutricionista == null)
+                return Unauthorized(new { mensaje = "Correo o contraseña incorrectos." });
+
+            var passwordValida = await ValidarPasswordNutricionistaAsync(nutricionista, request.Password);
+
+            if (!passwordValida)
+                return Unauthorized(new { mensaje = "Correo o contraseña incorrectos." });
+
+            return Ok(ToNutricionistaSeguro(nutricionista));
         }
 
         // POST: api/nutricionista
@@ -30,6 +54,13 @@ namespace SQL_API.Controllers
         {
             if (nuevoNutricionista == null)
                 return BadRequest(new { mensaje = "Debe enviar la información del nutricionista." });
+
+            if (string.IsNullOrWhiteSpace(nuevoNutricionista.Email) ||
+                string.IsNullOrWhiteSpace(nuevoNutricionista.PasswordEncriptado) ||
+                string.IsNullOrWhiteSpace(nuevoNutricionista.CodigoNutricionista))
+            {
+                return BadRequest(new { mensaje = "Correo, contraseña y código de nutricionista son obligatorios." });
+            }
 
             var tipoCobroNormalizado = NormalizarTipoCobro(nuevoNutricionista.TipoCobro);
 
@@ -46,10 +77,25 @@ namespace SQL_API.Controllers
             nuevoNutricionista.Email = nuevoNutricionista.Email.Trim();
             nuevoNutricionista.NumeroTarjeta = nuevoNutricionista.NumeroTarjeta.Trim();
 
+            var emailExiste = await _context.Nutricionistas
+                .AnyAsync(n => n.Email.ToLower() == nuevoNutricionista.Email.ToLower());
+
+            if (emailExiste)
+                return Conflict(new { mensaje = "Ya existe un nutricionista con ese correo electrónico." });
+
+            var codigoExiste = await _context.Nutricionistas
+                .AnyAsync(n => n.CodigoNutricionista.ToLower() == nuevoNutricionista.CodigoNutricionista.ToLower());
+
+            if (codigoExiste)
+                return Conflict(new { mensaje = "Ya existe un nutricionista con ese código." });
+
+            // Aunque el campo se llame PasswordEncriptado, se guarda un hash PBKDF2 con salt.
+            nuevoNutricionista.PasswordEncriptado = PasswordSecurity.HashPassword(nuevoNutricionista.PasswordEncriptado);
+
             _context.Nutricionistas.Add(nuevoNutricionista);
             await _context.SaveChangesAsync();
 
-            return Ok(nuevoNutricionista);
+            return Ok(ToNutricionistaSeguro(nuevoNutricionista));
         }
 
         private static string? NormalizarTipoCobro(string? tipoCobro)
@@ -62,6 +108,44 @@ namespace SQL_API.Controllers
                 "MENSUAL" or "MENSUALES" => "Mensual",
                 "ANUAL" or "ANUALES" => "Anual",
                 _ => null
+            };
+        }
+
+        private async Task<bool> ValidarPasswordNutricionistaAsync(Nutricionista nutricionista, string passwordIngresado)
+        {
+            if (PasswordSecurity.VerifyPassword(passwordIngresado, nutricionista.PasswordEncriptado))
+                return true;
+
+            // Compatibilidad con datos viejos: si estaba en texto plano, permite el login una vez
+            // y reemplaza inmediatamente el valor por hash.
+            if (PasswordSecurity.VerifyLegacyPlainText(passwordIngresado, nutricionista.PasswordEncriptado))
+            {
+                nutricionista.PasswordEncriptado = PasswordSecurity.HashPassword(passwordIngresado);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+
+            return false;
+        }
+
+        private static object ToNutricionistaSeguro(Nutricionista nutricionista)
+        {
+            return new
+            {
+                nutricionista.CodigoNutricionista,
+                nutricionista.Cedula,
+                nutricionista.Nombre,
+                nutricionista.Apellido1,
+                nutricionista.Apellido2,
+                nutricionista.FechaNacimiento,
+                nutricionista.Peso,
+                nutricionista.IMC,
+                nutricionista.Direccion,
+                nutricionista.Foto,
+                nutricionista.NumeroTarjeta,
+                nutricionista.TipoCobro,
+                nutricionista.Email,
+                PasswordEncriptado = string.Empty
             };
         }
 

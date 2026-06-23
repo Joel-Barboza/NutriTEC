@@ -4,10 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { AuthService } from '../../services/auth.service';
-import {
-  Nutricionista,
-  NutricionistaService
-} from '../../services/nutricionista.service';
+import { Nutricionista } from '../../services/nutricionista.service';
 
 @Component({
   selector: 'app-login',
@@ -44,7 +41,6 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private nutricionistaService: NutricionistaService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) { }
@@ -166,45 +162,25 @@ export class LoginComponent implements OnInit {
 
     this.cargando = true;
 
-    this.nutricionistaService.getUsuarios().subscribe({
-      next: (nutricionistas) => {
-
-        const existe = nutricionistas.some(
-          u =>
-            u.email.trim().toLowerCase() ===
-            this.formulario.email.trim().toLowerCase()
-        );
-
-        if (existe) {
+    this.authService
+      .register(this.formulario)
+      .subscribe({
+        next: () => {
           this.cargando = false;
-          this.emailYaRegistrado = true;
+          this.router.navigate(['/dashboard']);
           this.cdr.detectChanges();
-          return;
+        },
+        error: (error) => {
+          this.cargando = false;
+          if (error.status === 409) {
+            this.emailYaRegistrado = true;
+          } else {
+            this.error =
+              'No se pudo crear la cuenta.';
+          }
+          this.cdr.detectChanges();
         }
-
-        this.authService
-          .register(this.formulario)
-          .subscribe({
-            next: () => {
-              this.cargando = false;
-              this.router.navigate(['/dashboard']);
-              this.cdr.detectChanges();
-            },
-            error: () => {
-              this.cargando = false;
-              this.error =
-                'No se pudo crear la cuenta.';
-              this.cdr.detectChanges();
-            }
-          });
-      },
-      error: () => {
-        this.cargando = false;
-        this.error =
-          'Error al conectar con el servidor.';
-        this.cdr.detectChanges();
-      }
-    });
+      });
   }
 
   siguientePaso(): void {

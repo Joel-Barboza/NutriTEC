@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { AuthService } from '../../services/auth.service';
-import { Paciente, PacienteService } from '../../services/paciente.service';
+import { Paciente } from '../../services/paciente.service';
 
 @Component({
   selector: 'app-login',
@@ -30,7 +30,6 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private auth: AuthService,
-    private pacienteService: PacienteService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
@@ -108,40 +107,24 @@ export class LoginComponent implements OnInit {
       return;
     }
 
+    // pesoInicial = pesoActual al registrarse
+    f.pesoInicial = f.pesoActual;
+
     this.cargando = true;
 
-    this.pacienteService.getPacientes().subscribe({
-      next: (pacientes) => {
-        const existe = pacientes.some(
-          (p) => p.email.toLowerCase() === f.email.toLowerCase()
-        );
-
-        if (existe) {
-          this.cargando = false;
-          this.emailYaRegistrado = true;
-          this.cdr.detectChanges();
-          return;
-        }
-
-        // pesoInicial = pesoActual al registrarse
-        f.pesoInicial = f.pesoActual;
-
-        this.auth.register(f).subscribe({
-          next: () => {
-            this.cargando = false;
-            this.router.navigate(['/dashboard']);
-            this.cdr.detectChanges();
-          },
-          error: () => {
-            this.cargando = false;
-            this.error = 'No se pudo crear la cuenta. Verifique los datos.';
-            this.cdr.detectChanges();
-          }
-        });
-      },
-      error: () => {
+    this.auth.register(f).subscribe({
+      next: () => {
         this.cargando = false;
-        this.error = 'Error al conectar con el servidor.';
+        this.router.navigate(['/dashboard']);
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        this.cargando = false;
+        if (error.status === 409) {
+          this.emailYaRegistrado = true;
+        } else {
+          this.error = 'No se pudo crear la cuenta. Verifique los datos.';
+        }
         this.cdr.detectChanges();
       }
     });
