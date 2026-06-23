@@ -23,7 +23,6 @@ export interface Producto {
 @Injectable({ providedIn: 'root' })
 export class ProductoService {
   private apiUrl = `${environment.sqlApiUrl}/producto`;
-  // private apiUrl = 'https://sqlapi20260610230651-hea3g5bkguh0edd7.eastus2-01.azurewebsites.net/api/producto';
 
   constructor(private http: HttpClient) {}
 
@@ -37,5 +36,13 @@ export class ProductoService {
 
   crear(producto: Producto): Observable<any> {
     return this.http.post(this.apiUrl, producto);
+  }
+
+  actualizar(codigo: string, producto: Producto): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${encodeURIComponent(codigo)}`, producto);
+  }
+
+  eliminar(codigo: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${encodeURIComponent(codigo)}`);
   }
 }
