@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SQL_API.Models;
+using System.Data;
 
 namespace SQL_API.Controllers
 {
@@ -30,8 +31,8 @@ namespace SQL_API.Controllers
                 .Include(c => c.Producto)
                 .Include(c => c.Receta)
                 .Where(c =>
-                    c.PacienteEmail.ToLower() == pacienteEmail.ToLower() &&
-                    c.Fecha == fechaFiltro)
+                    c.PacienteEmail.ToLower() == pacienteEmail.Trim().ToLower() &&
+                    c.Fecha.Date == fechaFiltro)
                 .OrderBy(c => c.TiempoComida)
                 .ToListAsync();
 
@@ -39,6 +40,7 @@ namespace SQL_API.Controllers
         }
 
         // GET: api/consumodiario/resumen?pacienteEmail=X&fecha=YYYY-MM-DD
+        // Endpoint usado por la vista de Seguimiento Paciente.
         [HttpGet("resumen")]
         public async Task<IActionResult> GetResumen(
             [FromQuery] string pacienteEmail,
@@ -48,32 +50,90 @@ namespace SQL_API.Controllers
                 return BadRequest(new { mensaje = "El email del paciente es requerido." });
 
             var fechaFiltro = (fecha ?? DateTime.Today).Date;
+            var filas = new List<ConsumoResumenFila>();
 
-            var consumos = await _context.ConsumosDiarios
-                .Include(c => c.Producto)
-                .Include(c => c.Receta)
-                .Where(c =>
-                    c.PacienteEmail.ToLower() == pacienteEmail.ToLower() &&
-                    c.Fecha == fechaFiltro)
-                .ToListAsync();
-
-            var resumen = consumos.GroupBy(c => c.TiempoComida).Select(g => new
+            try
             {
-                TiempoComida = g.Key,
-                Items = g.Select(c => new
+                var conexion = _context.Database.GetDbConnection();
+                await using var comando = conexion.CreateCommand();
+
+                comando.CommandText = @"
+                    SELECT
+                        cd.IdConsumo,
+                        cd.TiempoComida,
+                        ISNULL(p.Descripcion, r.NombreReceta) AS Nombre,
+                        cd.Cantidad,
+                        CAST(ISNULL(p.EnergiaKcal, r.CaloriasTotales) * cd.Cantidad AS DECIMAL(18,2)) AS Calorias
+                    FROM ConsumoDiario cd
+                    LEFT JOIN Producto p ON p.CodigoBarras = cd.ProductoCodigo
+                    LEFT JOIN Receta r ON r.IdReceta = cd.IdReceta
+                    WHERE LOWER(cd.PacienteEmail) = LOWER(@PacienteEmail)
+                      AND CAST(cd.Fecha AS DATE) = @Fecha
+                    ORDER BY
+                        CASE cd.TiempoComida
+                            WHEN 'Desayuno' THEN 1
+                            WHEN 'Merienda Mañana' THEN 2
+                            WHEN 'Almuerzo' THEN 3
+                            WHEN 'Merienda Tarde' THEN 4
+                            WHEN 'Cena' THEN 5
+                            ELSE 6
+                        END,
+                        cd.IdConsumo;";
+
+                var parametroEmail = comando.CreateParameter();
+                parametroEmail.ParameterName = "@PacienteEmail";
+                parametroEmail.Value = pacienteEmail.Trim();
+                comando.Parameters.Add(parametroEmail);
+
+                var parametroFecha = comando.CreateParameter();
+                parametroFecha.ParameterName = "@Fecha";
+                parametroFecha.Value = fechaFiltro;
+                comando.Parameters.Add(parametroFecha);
+
+                if (conexion.State != ConnectionState.Open)
+                    await conexion.OpenAsync();
+
+                await using var reader = await comando.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
                 {
-                    c.IdConsumo,
-                    Nombre = c.Producto?.Descripcion ?? c.Receta?.NombreReceta ?? "Desconocido",
-                    c.Cantidad,
-                    Calorias = c.Producto != null
-                        ? (int)(c.Producto.EnergiaKcal * c.Cantidad)
-                        : (int)((c.Receta?.CaloriasTotales ?? 0) * c.Cantidad)
-                }),
-                TotalCalorias = g.Sum(c =>
-                    c.Producto != null
-                        ? (int)(c.Producto.EnergiaKcal * c.Cantidad)
-                        : (int)((c.Receta?.CaloriasTotales ?? 0) * c.Cantidad))
-            });
+                    filas.Add(new ConsumoResumenFila
+                    {
+                        IdConsumo = reader.GetInt32(reader.GetOrdinal("IdConsumo")),
+                        TiempoComida = reader.GetString(reader.GetOrdinal("TiempoComida")),
+                        Nombre = reader.IsDBNull(reader.GetOrdinal("Nombre"))
+                            ? "Desconocido"
+                            : reader.GetString(reader.GetOrdinal("Nombre")),
+                        Cantidad = reader.GetDecimal(reader.GetOrdinal("Cantidad")),
+                        Calorias = reader.IsDBNull(reader.GetOrdinal("Calorias"))
+                            ? 0
+                            : reader.GetDecimal(reader.GetOrdinal("Calorias"))
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    mensaje = "No se pudo cargar el resumen de consumo diario.",
+                    detalle = ex.Message
+                });
+            }
+
+            var resumen = filas
+                .GroupBy(f => f.TiempoComida)
+                .Select(g => new
+                {
+                    tiempoComida = g.Key,
+                    items = g.Select(f => new
+                    {
+                        idConsumo = f.IdConsumo,
+                        nombre = f.Nombre,
+                        cantidad = f.Cantidad,
+                        calorias = decimal.ToInt32(Math.Round(f.Calorias, 0))
+                    }).ToList(),
+                    totalCalorias = decimal.ToInt32(Math.Round(g.Sum(f => f.Calorias), 0))
+                })
+                .ToList();
 
             return Ok(resumen);
         }
@@ -115,7 +175,7 @@ namespace SQL_API.Controllers
             _context.ConsumosDiarios.Add(consumo);
             await _context.SaveChangesAsync();
 
-            return Ok(new { mensaje = "Consumo registrado con éxito.", idConsumo = consumo.IdConsumo });
+            return Ok(new { mensaje = "Consumo registrado con exito.", idConsumo = consumo.IdConsumo });
         }
 
         // DELETE: api/consumodiario/{id}
@@ -131,6 +191,15 @@ namespace SQL_API.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(new { mensaje = "Consumo eliminado." });
+        }
+
+        private class ConsumoResumenFila
+        {
+            public int IdConsumo { get; set; }
+            public string TiempoComida { get; set; } = string.Empty;
+            public string Nombre { get; set; } = string.Empty;
+            public decimal Cantidad { get; set; }
+            public decimal Calorias { get; set; }
         }
     }
 }
