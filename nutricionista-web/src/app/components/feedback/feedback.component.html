@@ -1,59 +1,263 @@
-<div class="reservas-page">
-  <div class="reserva-top">
-    <h1>{{ title() }}</h1>
-    <button class="btn-recargar" (click)="cargarRetroalimentaciones()">🔄 Recargar</button>
+<div class="seguimiento-page">
+  <div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
+    <div>
+      <h4 class="fw-bold mb-1">
+        <i class="bi bi-chat-dots-fill me-2 text-success"></i>Seguimiento de Paciente
+      </h4>
+      <p class="text-muted mb-0">
+        Revise el plan asignado y el consumo registrado del paciente. 
+      </p>
+      <small class="badge mt-2" [ngClass]="mongoPingOk ? 'bg-success' : 'bg-warning text-dark'">
+        {{ mongoPingMensaje || 'Verificando ..' }}
+      </small>
+    </div>
+
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-secondary btn-sm" (click)="cargarPacientesAsociados()">
+        <span *ngIf="cargandoPacientes" class="spinner-border spinner-border-sm me-1"></span>
+        Buscar pacientes
+      </button>
+      <button class="btn btn-outline-primary btn-sm" (click)="refrescarTodo()">
+        <span *ngIf="hayCargaActiva" class="spinner-border spinner-border-sm me-1"></span>
+        Refrescar seguimiento
+      </button>
+    </div>
   </div>
 
-  <div class="estado-inicial" *ngIf="cargando()">
-    <p class="texto-cargando">Conectando con Azure y MongoDB... Por favor espere.</p>
+  <div *ngIf="mensajeExito" class="alert alert-success alert-dismissible">
+    {{ mensajeExito }}
+    <button type="button" class="btn-close" (click)="mensajeExito=''" aria-label="Cerrar"></button>
   </div>
 
-  <div class="toolbar" *ngIf="errorMsg()">
-    <p class="msg-error">⚠️ {{ errorMsg() }}</p>
+  <div *ngIf="errorPacientes" class="alert alert-danger alert-dismissible">
+    {{ errorPacientes }}
+    <button type="button" class="btn-close" (click)="errorPacientes=''" aria-label="Cerrar"></button>
   </div>
 
-  <div class="estado-inicial" *ngIf="!cargando() && hilos().length === 0 && !errorMsg()">
-    <p>No se encontraron hilos de retroalimentación en la base de datos.</p>
+  <div *ngIf="errorFormulario" class="alert alert-warning alert-dismissible">
+    {{ errorFormulario }}
+    <button type="button" class="btn-close" (click)="errorFormulario=''" aria-label="Cerrar"></button>
   </div>
 
-  <div class="reservas-list" *ngIf="!cargando() && hilos().length > 0">
-    <div class="reserva-card" *ngFor="let hilo of hilos()">
-      
-      <div class="reserva-top">
-        <div class="reserva-ruta">📌 {{ hilo.tituloHilo }}</div>
-        <span class="estado-badge">ID: {{ hilo.pacienteId }}</span>
+  <div *ngIf="errorPlanes" class="alert alert-warning alert-dismissible">
+    {{ errorPlanes }}
+    <button type="button" class="btn-close" (click)="errorPlanes=''" aria-label="Cerrar"></button>
+  </div>
+
+  <div *ngIf="errorConsumo" class="alert alert-warning alert-dismissible">
+    {{ errorConsumo }}
+    <button type="button" class="btn-close" (click)="errorConsumo=''" aria-label="Cerrar"></button>
+  </div>
+
+  <div *ngIf="errorMongo" class="alert alert-danger alert-dismissible">
+    {{ errorMongo }}
+    <button type="button" class="btn-close" (click)="errorMongo=''" aria-label="Cerrar"></button>
+  </div>
+
+  <div class="card p-3 mb-4">
+    <div class="row g-3 align-items-end">
+      <div class="col-md-8">
+        <label class="form-label fw-semibold">Paciente asociado</label>
+        <select
+          class="form-select"
+          [ngModel]="pacienteSeleccionadoEmail"
+          (ngModelChange)="seleccionarPaciente($event)"
+          [disabled]="pacientesAsociados.length === 0">
+          <option value="" disabled>Seleccione un paciente...</option>
+          <option *ngFor="let paciente of pacientesAsociados" [value]="paciente.pacienteEmail">
+            {{ paciente.nombreCompleto }} - {{ paciente.pacienteEmail }}
+          </option>
+        </select>
+        <small class="text-muted" *ngIf="cargandoPacientes">Cargando pacientes asociados...</small>
+        <small class="text-muted" *ngIf="!cargandoPacientes && pacientesAsociados.length === 0">
+          No tiene pacientes asociados todavía. Primero asocie un paciente desde la sección Pacientes.
+        </small>
       </div>
 
-      <div class="reserva-details">
-        <div class="detail-item">
-          <span class="detail-label">Nutricionista</span>
-          <span class="detail-value">{{ hilo.nutricionistaId }}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Fecha Apertura</span>
-          <span class="detail-value">{{ hilo.fechaCreacion | date:'dd/MM/yyyy HH:mm:ss' }}</span>
-        </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold">Fecha de revisión</label>
+        <input
+          type="date"
+          class="form-control"
+          [ngModel]="fechaSeleccionada"
+          (ngModelChange)="seleccionarFecha($event)">
       </div>
+    </div>
+  </div>
 
-      <div class="reserva-actions" style="background-color: #f9fafb; padding: 15px; border-radius: 8px; margin-top: 10px;">
-        <span class="detail-label" style="margin-bottom: 8px; display: block;">Historial de Mensajes</span>
-        
-        <div class="conversacion-container" style="display: flex; flex-direction: column; gap: 10px;">
-          <div *ngFor="let mensaje of hilo.conversacion" 
-               [style.align-self]="mensaje.autor === 'Nutricionista' ? 'flex-start' : 'flex-end'"
-               [style.background-color]="mensaje.autor === 'Nutricionista' ? '#eff6ff' : '#f0fdf4'"
-               [style.border-color]="mensaje.autor === 'Nutricionista' ? '#bfdbfe' : '#bbf7d0'"
-               style="max-width: 85%; padding: 10px 14px; border: 1px solid; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
-            
-            <div style="display: flex; justify-content: space-between; gap: 20px; margin-bottom: 4px;">
-              <strong style="font-size: 0.8rem; color: #374151;">💬 {{ mensaje.autor }}</strong>
-              <small style="font-size: 0.7rem; color: #9ca3af;">{{ mensaje.fecha | date:'shortTime' }}</small>
+  <div class="row g-4" *ngIf="pacienteSeleccionadoEmail">
+    <div class="col-xl-5">
+      <div class="card p-4 h-100 seguimiento-card-left">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div>
+            <h5 class="fw-bold mb-1">Seguimiento del día</h5>
+            <small class="text-muted">{{ pacienteSeleccionado?.nombreCompleto }} · {{ fechaSeleccionada }}</small>
+          </div>
+          <div class="d-flex gap-2 flex-wrap justify-content-end">
+            <span class="badge bg-primary fs-6">Plan {{ totalCaloriasPlan }} kcal</span>
+            <span class="badge bg-success fs-6">Consumido {{ totalCaloriasDia }} kcal</span>
+          </div>
+        </div>
+
+        <section class="mb-4">
+          <h6 class="fw-bold mb-2">Plan asignado para esta fecha</h6>
+
+          <div *ngIf="cargandoPlanes" class="text-center py-4">
+            <div class="spinner-border text-primary"></div>
+            <p class="text-muted mt-2 mb-0">Cargando plan asignado...</p>
+          </div>
+
+          <div *ngIf="!cargandoPlanes && planesAsignados.length === 0" class="empty-state py-4">
+            <i class="bi bi-calendar-x fs-2"></i>
+            <p class="mb-0 mt-2">No hay un plan alimenticio asignado para este paciente en esta fecha.</p>
+          </div>
+
+          <div *ngIf="!cargandoPlanes && planesAsignados.length > 0" class="plan-list">
+            <div class="plan-card" *ngFor="let plan of planesAsignados; trackBy: trackByPlanId">
+              <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                <div>
+                  <strong>{{ plan.nombrePlan }}</strong>
+                  <div>
+                    <small class="text-muted">
+                      Vigente: {{ plan.fechaInicio | date:'dd/MM/yyyy' }} - {{ plan.fechaFin | date:'dd/MM/yyyy' }}
+                    </small>
+                  </div>
+                </div>
+                <span class="badge bg-light text-dark border">{{ plan.caloriasTotales }} kcal</span>
+              </div>
+
+              <div class="tiempo-card" *ngFor="let grupo of plan.detallesPorTiempo">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <strong>{{ grupo.tiempoComida }}</strong>
+                  <span class="badge bg-light text-dark border">{{ grupo.totalCalorias }} kcal</span>
+                </div>
+
+                <div class="consumo-item" *ngFor="let item of grupo.items">
+                  <div>
+                    <div class="fw-semibold">{{ item.nombre }}</div>
+                    <small class="text-muted">
+                      {{ item.porciones }} porción(es) · {{ item.tamanoPorcion }} {{ item.unidadMedida }} c/u
+                    </small>
+                  </div>
+                  <span>{{ item.calorias }} kcal</span>
+                </div>
+              </div>
             </div>
-            <p style="margin: 0; font-size: 0.9rem; color: #1f2937;">{{ mensaje.mensaje }}</p>
+          </div>
+        </section>
+
+        <section>
+          <h6 class="fw-bold mb-2">Consumo registrado por el paciente</h6>
+
+          <div *ngIf="cargandoConsumo" class="text-center py-4">
+            <div class="spinner-border text-success"></div>
+            <p class="text-muted mt-2 mb-0">Cargando consumo...</p>
+          </div>
+
+          <div *ngIf="!cargandoConsumo && resumenConsumo.length === 0" class="empty-state py-4">
+            <i class="bi bi-journal-x fs-2"></i>
+            <p class="mb-0 mt-2">El paciente no tiene consumo registrado para esta fecha.</p>
+          </div>
+
+          <div *ngIf="!cargandoConsumo && resumenConsumo.length > 0" class="consumo-list">
+            <div class="tiempo-card" *ngFor="let grupo of resumenConsumo">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <strong>{{ grupo.tiempoComida }}</strong>
+                <span class="badge bg-light text-dark border">{{ grupo.totalCalorias }} kcal</span>
+              </div>
+
+              <div class="consumo-item" *ngFor="let item of grupo.items">
+                <div>
+                  <div class="fw-semibold">{{ item.nombre }}</div>
+                  <small class="text-muted">Cantidad: {{ item.cantidad }}</small>
+                </div>
+                <span>{{ item.calorias }} kcal</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="col-xl-7">
+      <div class="card p-4 mb-4">
+        <h5 class="fw-bold mb-3">Nueva retroalimentación</h5>
+
+        <label class="form-label fw-semibold">Título del hilo</label>
+        <input type="text" class="form-control mb-3" [(ngModel)]="tituloHilo" placeholder="Ej. Revisión del plan y consumo del día">
+
+        <label class="form-label fw-semibold">Comentario para el paciente</label>
+        <textarea
+          class="form-control seguimiento-textarea"
+          [(ngModel)]="mensajeNuevo"
+          placeholder="Escriba aquí la retroalimentación."></textarea>
+
+        <div class="d-flex justify-content-end mt-3">
+          <button class="btn btn-success" (click)="guardarRetroalimentacion()" [disabled]="guardando || !mensajeNuevo.trim()">
+            <span *ngIf="guardando" class="spinner-border spinner-border-sm me-1"></span>
+            Guardar retroalimentación
+          </button>
+        </div>
+      </div>
+
+      <div class="card p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0">Historial de retroalimentación</h5>
+          <span class="badge bg-secondary">{{ hilos.length }}</span>
+        </div>
+
+        <div *ngIf="cargandoHilos" class="text-center py-4">
+          <div class="spinner-border text-success"></div>
+          <p class="text-muted mt-2 mb-0">Cargando...</p>
+        </div>
+
+        <div *ngIf="!cargandoHilos && hilos.length === 0" class="empty-state py-4">
+          <i class="bi bi-chat-square-text fs-2"></i>
+          <p class="mb-0 mt-2">Aún no hay retroalimentación para este paciente.</p>
+        </div>
+
+        <div class="hilo-card" *ngFor="let hilo of hilos; trackBy: trackByHiloId">
+          <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+            <div>
+              <div class="fw-bold">{{ hilo.tituloHilo }}</div>
+              <small class="text-muted">
+                Creado: {{ hilo.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}
+                <span *ngIf="hilo.fechaConsumo"> · Fecha revisada: {{ hilo.fechaConsumo | date:'dd/MM/yyyy' }}</span>
+              </small>
+            </div>
+          </div>
+
+          <div class="conversacion-container">
+            <div
+              class="mensaje-burbuja"
+              *ngFor="let mensaje of hilo.conversacion"
+              [ngClass]="mensaje.autor === 'Nutricionista' ? 'mensaje-nutricionista' : 'mensaje-paciente'">
+              <div class="mensaje-header">
+                <strong>{{ mensaje.autor }}</strong>
+                <small>{{ mensaje.fecha | date:'dd/MM/yyyy HH:mm' }}</small>
+              </div>
+              <p>{{ mensaje.mensaje }}</p>
+            </div>
+          </div>
+
+          <div class="respuesta-box mt-3">
+            <textarea
+              class="form-control"
+              rows="2"
+              [(ngModel)]="respuestasPorHilo[hilo.id]"
+              placeholder="Responder en este hilo..."></textarea>
+            <div class="d-flex justify-content-end mt-2">
+              <button
+                class="btn btn-outline-success btn-sm"
+                (click)="responderHilo(hilo)"
+                [disabled]="respondiendoId === hilo.id || !respuestasPorHilo[hilo.id]?.trim()">
+                <span *ngIf="respondiendoId === hilo.id" class="spinner-border spinner-border-sm me-1"></span>
+                Responder
+              </button>
+            </div>
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </div>

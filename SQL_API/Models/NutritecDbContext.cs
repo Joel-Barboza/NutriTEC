@@ -23,6 +23,9 @@ namespace SQL_API.Models
             modelBuilder.Entity<Producto>()
                 .ToTable(tb => tb.HasTrigger("TR_Producto_Aprobacion"));
 
+            modelBuilder.Entity<ConsumoDiario>()
+                .ToTable(tb => tb.HasTrigger("TR_ConsumoDiario_FechaDefault"));
+
             modelBuilder.Entity<RecetaDetalle>()
                 .HasOne(rd => rd.Receta)
                 .WithMany(r => r.Detalles)

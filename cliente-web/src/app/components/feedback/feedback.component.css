@@ -1,0 +1,72 @@
+.feedback-page {
+  padding: 2rem;
+}
+
+.hilo-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.conversacion-container {
+  border: 1px solid #e4e9ef;
+  border-radius: 14px;
+  padding: 1rem;
+  background: #f8fafc;
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.mensaje-burbuja {
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.8rem;
+  max-width: 85%;
+  white-space: pre-wrap;
+}
+
+.mensaje-burbuja p {
+  margin-bottom: 0;
+}
+
+.mensaje-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.35rem;
+}
+
+.mensaje-nutricionista {
+  background: #e8f5e9;
+  border: 1px solid #b7dfbc;
+}
+
+.mensaje-paciente {
+  background: #e7f1ff;
+  border: 1px solid #b6d4fe;
+  margin-left: auto;
+}
+
+.respuesta-box {
+  border-top: 1px solid #edf0f3;
+  padding-top: 1rem;
+}
+
+.empty-state {
+  border: 1px dashed #cfd8dc;
+  color: #65717c;
+  text-align: center;
+  border-radius: 18px;
+}
+
+@media (max-width: 768px) {
+  .feedback-page {
+    padding: 1rem;
+  }
+
+  .mensaje-burbuja {
+    max-width: 100%;
+  }
+}

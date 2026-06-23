@@ -17,8 +17,8 @@ export class DashboardComponent {
     { nombre: 'Productos', valor: 'productos' },
     { nombre: 'Pacientes', valor: 'pacientes' },
     { nombre: 'Gestión de Planes', valor: 'planes' },
-    { nombre: 'Retroalimentación', valor: 'feedback' },
     { nombre: 'Asignar Plan', valor: 'asignar-plan' },
+    { nombre: 'Retroalimentación', valor: 'feedback' },
   ];
 
   constructor(private router: Router, private authService: AuthService) { }

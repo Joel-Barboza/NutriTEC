@@ -30,7 +30,7 @@ export interface RecetaCreateDto {
 
 @Injectable({ providedIn: 'root' })
 export class RecetaService {
-  private apiUrl = `${environment.sqlApiUrl}/producto`;
+  private apiUrl = `${environment.sqlApiUrl}/receta`;
   // private apiUrl = 'https://sqlapi20260610230651-hea3g5bkguh0edd7.eastus2-01.azurewebsites.net/api/receta';
 
   constructor(private http: HttpClient) {}

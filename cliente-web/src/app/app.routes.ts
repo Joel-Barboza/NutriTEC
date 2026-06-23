@@ -6,6 +6,7 @@ import { ConsumoDiarioComponent } from './components/consumo-diario/consumo-diar
 import { RecetasComponent } from './components/recetas/recetas.component';
 import { RegistroMedidasComponent } from './components/registro-medidas/registro-medidas.component';
 import { ReporteAvanceComponent } from './components/reporte-avance/reporte-avance.component';
+import { FeedbackComponent } from './components/feedback/feedback.component';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -21,7 +22,8 @@ export const routes: Routes = [
       { path: 'productos', component: ProductosComponent },
       { path: 'recetas', component: RecetasComponent },
       { path: 'medidas', component: RegistroMedidasComponent },
-      { path: 'reporte', component: ReporteAvanceComponent }
+      { path: 'reporte', component: ReporteAvanceComponent },
+      { path: 'feedback', component: FeedbackComponent }
     ]
   },
   { path: '**', redirectTo: 'login' }
