@@ -32,14 +32,19 @@ INSERT INTO Producto (CodigoBarras, Descripcion, TamanoPorcion, UnidadMedida,
     EnergiaKcal, GrasaG, SodioMg, CarbohidratosG, ProteinaG, Vitaminas,
     CalcioMg, HierroMg, AprobadoPorAdministrador, CreadoPor)
 VALUES
-('7441001001234', 'Arroz Blanco Cocido',           100.00, 'g',  130, 0.30,   1.00, 28.00,  2.70, 'Vitamina B6',          10.00, 1.20, 1, 'admin@nutritec.com'),
-('7441001005678', 'Frijoles Negros Cocidos',        100.00, 'g',  132, 0.50,   2.00, 23.00,  8.90, 'Hierro, Vitamina B1',  27.00, 3.70, 1, 'admin@nutritec.com'),
-('7441001009999', 'Aceite Vegetal',                  14.00, 'g',  120, 14.00,  0.00,  0.00,  0.00, 'Vitamina E',            0.00, 0.00, 1, 'admin@nutritec.com'),
-('7441001002222', 'Huevo Entero',                    50.00, 'g',   78,  5.00, 62.00,  0.60,  6.00, 'Vitamina D, B12',      25.00, 0.60, 1, 'admin@nutritec.com'),
-('7441001004444', 'Leche Semidescremada Dos Pinos', 250.00, 'ml', 110,  3.00,120.00, 12.00,  8.00, 'Vitamina A, D',       300.00, 0.10, 1, 'admin@nutritec.com'),
-('7441001006666', 'Pechuga de Pollo a la Plancha',  100.00, 'g',  165,  3.60, 74.00,  0.00, 31.00, 'Vitamina B3, B6',       11.00, 1.00, 1, 'admin@nutritec.com'),
-('7441001007777', 'Banano',                         118.00, 'g',  105,  0.40,  1.00, 27.00,  1.30, 'Vitamina B6, C',         5.00, 0.30, 1, 'admin@nutritec.com'),
-('7441001008888', 'Pan Integral',                    50.00, 'g',  120,  1.50,200.00, 22.00,  4.00, 'Vitamina B1, Hierro',   40.00, 1.40, 1, 'admin@nutritec.com');
+('7441001001234', 'Arroz Blanco Cocido',            100.00, 'g',  130,  0.30,   1.00, 28.00,  2.70, 'Vitamina B6',          10.00, 1.20, 1, 'admin@nutritec.com'),
+('7441001005678', 'Frijoles Negros Cocidos',        100.00, 'g',  132,  0.50,   2.00, 23.00,  8.90, 'Hierro, Vitamina B1',  27.00, 3.70, 1, 'admin@nutritec.com'),
+('7441001009999', 'Aceite Vegetal',                 14.00,  'g',  120, 14.00,  0.00,  0.00,  0.00, 'Vitamina E',            0.00, 0.00, 1, 'admin@nutritec.com'),
+('7441001002222', 'Huevo Entero',                   50.00,  'g',   78,  5.00, 62.00,  0.60,  6.00, 'Vitamina D, B12',       25.00, 0.60, 1, 'admin@nutritec.com'),
+('7441001004444', 'Leche Semidescremada Dos Pinos', 250.00, 'ml', 110,  3.00,120.00, 12.00,  8.00, 'Vitamina A, D',         300.00, 0.10, 1, 'admin@nutritec.com'),
+('7441001006666', 'Pechuga de Pollo a la Plancha',  100.00, 'g',  165,  3.60, 74.00,  0.00, 31.00,  'Vitamina B3, B6',       11.00, 1.00, 1, 'admin@nutritec.com'),
+('7441001007777', 'Banano',                         118.00, 'g',  105,  0.40,  1.00, 27.00,  1.30,  'Vitamina B6, C',         5.00, 0.30, 1, 'admin@nutritec.com'),
+('7441001008888', 'Pan Integral',                   50.00,  'g',  120,  1.50,200.00, 22.00,  4.00,  'Vitamina B1, Hierro',   40.00, 1.40, 1, 'admin@nutritec.com'),
+('7441001011111', 'Manzana Roja',                   182.00, 'g', 95,    0.30, 2.00, 25.00, 0.50,    'Vitamina C',           11.00, 0.20, 1, 'admin@nutritec.com'),
+('7441001012222', 'Atún en Agua',                   100.00, 'g', 116,   0.80, 333.00, 0.00, 26.00,  'Vitamina B12',         8.00, 1.30, 1, 'admin@nutritec.com'),
+('7441001013333', 'Avena en Hojuelas',              40.00,  'g', 156, 2.80, 2.00, 26.50, 6.80,      'Hierro',               20.00, 1.80, 1, 'admin@nutritec.com'),
+('7441001014444', 'Tomate',                         100.00, 'g', 18, 0.20, 5.00, 3.90, 0.90,        'Vitamina C',           10.00, 0.30, 1, 'admin@nutritec.com'),
+('7441001015555', 'Aguacate Hass',                  100.00, 'g', 160, 14.70, 7.00, 8.50, 2.00,      'Potasio, Vitamina E', 12.00, 0.60, 1, 'admin@nutritec.com');
 
 -- 5. ASOCIAR PACIENTES A NUTRICIONISTAS
 INSERT INTO PacienteNutricionista (PacienteEmail, NutricionistaCodigo, FechaAsociacion)
